@@ -39,7 +39,6 @@ app.get('/api/chat', async (req, res) => {
     for await (const chunk of completion) {
       const content = chunk.choices[0]?.delta?.content;
       if (content) {
-        console.log(content)
         res.write(`data: ${content}\n\n`); // Send the chunk to the client
       }
     }
