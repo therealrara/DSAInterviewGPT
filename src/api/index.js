@@ -8,7 +8,7 @@ app.use(cors());
 const port = 4000;
 
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_KEY,
+  apiKey: process.env.OPENAI_API_KEY,
 });
 
 // Enable CORS if needed
@@ -17,17 +17,24 @@ app.use((req, res, next) => {
   next();
 });
 
-// SSE Endpoint to Stream ChatGPT Response
-app.get('/api/chat', async (req, res) => {
-  const { prompt } = req.query;
 
+let conversationArr = []
+
+// SSE Endpoint to Stream ChatGPT Response
+app.get('/api/startInterview', async (req, res) => {
+  conversationArr = []
+  let prompt = "Can You give me a DSA Coding Question? In Addition, Please do not give any approaches or hints to the candidate or give them any followups. No Edge Cases Either. Please silently take points away if candidate does not consider edge cases."
+  conversationArr.push({ role: "human", text: prompt });
   if (!prompt) {
     return res.status(400).json({ error: "Prompt is required" });
   }
 
+  let fullResponse = '';
+  let chunkBuffer = '';
   res.setHeader('Content-Type', 'text/event-stream');
   res.setHeader('Cache-Control', 'no-cache');
   res.setHeader('Connection', 'keep-alive');
+
 
   try {
     const completion = await openai.chat.completions.create(
@@ -41,9 +48,35 @@ app.get('/api/chat', async (req, res) => {
     for await (const chunk of completion) {
       const content = chunk.choices[0]?.delta?.content;
       if (content) {
-        res.write(`data: ${content}\n\n`); // Send the chunk to the client
+        // Accumulate full response for storing
+        fullResponse += content;
+
+        // Append to chunkBuffer for streaming
+        chunkBuffer += content;
+
+        // Check for natural breaks (newlines or double newlines)
+        if (chunkBuffer.includes('\n')) {
+          const lines = chunkBuffer.split('\n'); // Split into lines
+
+          // Send all complete lines, keep the last incomplete line in the buffer
+          for (let i = 0; i < lines.length - 1; i++) {
+            res.write(`data: ${lines[i]}\n\n`);
+          }
+
+          // Retain the last incomplete line in the buffer
+          chunkBuffer = lines[lines.length - 1];
+        }
       }
     }
+
+    // Flush any remaining content in the buffer
+    if (chunkBuffer) {
+      res.write(`data: ${chunkBuffer}\n\n`);
+    }
+
+    console.log(fullResponse)
+    // Add the full response to the conversation history
+    conversationArr.push({ role: "assistant", text: fullResponse });
 
     res.write("data: [DONE]\n\n"); // Signal that streaming is complete
     res.end();

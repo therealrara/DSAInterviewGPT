@@ -12,13 +12,14 @@ const ChatComponent = () => {
     setResponse(''); // Clear previous response
 
     // Create a new EventSource for the stream
-    const eventSource = new EventSource(`/api/chat?prompt=${encodeURIComponent(prompt)}`);
+    const eventSource = new EventSource(`/api/startInterview?prompt=${encodeURIComponent(prompt)}`);
 
     eventSource.onmessage = (event) => {
       if (event.data === "[DONE]") {
+          console.log("COMPLETE");
         eventSource.close();
       } else {
-        setResponse((prev) => prev + event.data); // Append new data to response
+        setResponse((prev) => prev + event.data + "\n"); // Append new data to response
       }
     };
 
