@@ -1,8 +1,10 @@
 const express = require('express');
 const {  OpenAI } = require('openai');
+const cors = require('cors');
 require('dotenv').config();
 
 const app = express();
+app.use(cors());
 const port = 4000;
 
 const openai = new OpenAI({
@@ -30,7 +32,7 @@ app.get('/api/chat', async (req, res) => {
   try {
     const completion = await openai.chat.completions.create(
         {
-          model: "gpt-3.5-turbo",
+          model: "gpt-4o",
           messages: [{ role: "user", content: prompt }],
           stream: true, // Enable streaming
         },

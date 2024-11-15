@@ -1,61 +1,51 @@
-import React, { Component } from 'react'
-import logos from './logos.svg'
-import './App.css'
+import React, { useState } from 'react';
 
-class App extends Component {
-  state = {
-    count: 'loading...'
-  }
+const ChatComponent = () => {
+  const [prompt, setPrompt] = useState('');
+  const [response, setResponse] = useState('');
 
-  componentDidMount = async () => {
-    const { count } = await window.fetch(`/api/count`).then(res => res.json())
-    this.setState({ count })
-  }
+  const handlePromptChange = (e) => {
+    setPrompt(e.target.value);
+  };
 
-  increment = async () => {
-    const { count } = await window
-      .fetch(`/api/count/increment`, { method: 'POST' })
-      .then(res => res.json())
-    this.setState({ count })
-  }
+  const handleSendPrompt = () => {
+    setResponse(''); // Clear previous response
 
-  render() {
-    return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logos} className="App-logo" alt="logo" />
-          <p>
-            {'Learn '}
-            <a href="https://reactjs.org" target="_blank" rel="noopener noreferrer">
-              React
-            </a>
-            {', '}
-            <a href="https://expressjs.com" target="_blank" rel="noopener noreferrer">
-              Express
-            </a>
-            {', and '}
-            <a href="https://kubernetes.io" target="_blank" rel="noopener noreferrer">
-              Kubernetes
-            </a>
-          </p>
-          <p>
-            Modify <code>src/www/App.js</code> or <code>src/api/index.js</code> to reload UI or API.
-          </p>
-          <p>
-            <code>yarn deploy</code> to build containers and deploy them to production
-          </p>
-          <hr />
-          <h2>Count: {this.state.count}</h2>
-          <p>
-            Call <code>/api/count/increment</code>
-            <button onClick={this.increment} className="App-button">
-              Go
-            </button>
-          </p>
-        </header>
+    // Create a new EventSource for the stream
+    const eventSource = new EventSource(`/api/chat?prompt=${encodeURIComponent(prompt)}`);
+
+    eventSource.onmessage = (event) => {
+      if (event.data === "[DONE]") {
+        eventSource.close();
+      } else {
+        setResponse((prev) => prev + event.data); // Append new data to response
+      }
+    };
+
+    eventSource.onerror = (error) => {
+      console.error("Error with EventSource:", error);
+      eventSource.close();
+    };
+  };
+
+  return (
+      <div>
+        <h1>Chat with GPT-3.5</h1>
+        <textarea
+            value={prompt}
+            onChange={handlePromptChange}
+            placeholder="Type your prompt here..."
+            rows="4"
+            cols="50"
+        />
+        <br />
+        <button onClick={handleSendPrompt}>Send Prompt</button>
+        <h2>Response:</h2>
+        <div style={{ whiteSpace: 'pre-wrap', border: '1px solid #ccc', padding: '10px' }}>
+          {response}
+        </div>
       </div>
-    )
-  }
-}
+  );
+};
 
-export default App
+export default ChatComponent;
