@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import ReactMarkdown from 'react-markdown';
+import './App.css';
 
 const ChatComponent = () => {
   const [prompt, setPrompt] = useState('');
@@ -31,7 +33,7 @@ const ChatComponent = () => {
 
   return (
       <div>
-        <h1>Chat with GPT-3.5</h1>
+        <h1>Chat with GPT-4o</h1>
         <textarea
             value={prompt}
             onChange={handlePromptChange}
@@ -42,8 +44,8 @@ const ChatComponent = () => {
         <br />
         <button onClick={handleSendPrompt}>Send Prompt</button>
         <h2>Response:</h2>
-        <div style={{ whiteSpace: 'pre-wrap', border: '1px solid #ccc', padding: '10px' }}>
-          {response}
+        <div className="markdown-container" style={{ whiteSpace: 'pre-wrap', border: '1px solid #ccc', padding: '10px' }}>
+          <ReactMarkdown>{response}</ReactMarkdown>
         </div>
       </div>
   );
