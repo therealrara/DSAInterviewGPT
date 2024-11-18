@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import ReactMarkdown from "react-markdown";
 import "./App.css";
+import './ChatAssistant.css';
 
 const ChatComponent = () => {
     const [conversation, setConversation] = useState([]); // Stores the chat history

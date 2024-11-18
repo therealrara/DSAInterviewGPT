@@ -1,0 +1,55 @@
+.chat-assistant {
+    padding: 20px;
+    background-color: #ffffff; /* White background for the chat container */
+    border: 1px solid #ddd;    /* Light gray border for definition */
+    border-radius: 8px;
+    max-width: 800px;
+    margin: 20px auto;         /* Center the chat container */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+  }
+  
+  .chat-assistant p {
+    margin-bottom: 16px;
+    color: #333; /* Darker text for readability */
+  }
+  
+  .chat-assistant h1,
+  .chat-assistant h2,
+  .chat-assistant h3,
+  .chat-assistant h4,
+  .chat-assistant h5,
+  .chat-assistant h6 {
+    margin-top: 24px;
+    margin-bottom: 16px;
+    color: #2c3e50; /* Darker color for headers */
+  }
+  
+  .chat-assistant ul,
+  .chat-assistant ol {
+    margin-bottom: 16px;
+    padding-left: 20px; /* Indent list items */
+  }
+  
+  .chat-assistant li {
+    margin-bottom: 8px;
+  }
+  
+  .chat-assistant code {
+    background-color: #e7e7e7; /* Gray background for inline code */
+    padding: 2px 4px;
+    border-radius: 4px;
+    margin: 0 2px;
+    color: #c7254e; /* Red color for better contrast */
+  }
+  
+  .chat-assistant pre {
+    background-color: #282c34; /* Darker background for code blocks */
+    color: #f8f9fa; /* Light text for code blocks */
+    padding: 16px;
+    border-radius: 8px;
+    margin-bottom: 24px;
+    overflow-x: auto; /* Horizontal scrolling for long code */
+  }
+  
