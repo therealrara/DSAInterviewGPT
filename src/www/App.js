@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import ReactMarkdown from "react-markdown";
+import MarkdownRenderer from './MarkdownRenderer';
+import 'katex/dist/katex.min.css'; 
 import "./App.css";
 import './ChatAssistant.css';
 
@@ -103,7 +105,8 @@ const ChatComponent = () => {
                         key={index}
                         className={entry.role === "user" ? "chat-user" : "chat-assistant"}
                     >
-                        <ReactMarkdown>{entry.content}</ReactMarkdown>
+                        <MarkdownRenderer markdownContent={entry.content}/>
+                        {/* <ReactMarkdown>{entry.content}</ReactMarkdown> */}
                     </div>
                 ))}
             </div>
@@ -117,7 +120,7 @@ const ChatComponent = () => {
             />
             <br />
             <button onClick={handleSendMessage} disabled={loading || !message.trim()}>
-                Send Message
+                Submit Response
             </button>
         </div>
     );

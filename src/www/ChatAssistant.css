@@ -1,3 +1,5 @@
+/* ChatAssistant.css */
+
 .chat-assistant {
     padding: 20px;
     background-color: #ffffff; /* White background for the chat container */
@@ -8,6 +10,14 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
     font-family: Arial, sans-serif;
     line-height: 1.6;
+  }
+  
+  .chat-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    min-height: 100vh;
   }
   
   .chat-assistant p {
@@ -52,4 +62,24 @@
     margin-bottom: 24px;
     overflow-x: auto; /* Horizontal scrolling for long code */
   }
+  
+  button {
+    margin: 10px;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    cursor: pointer;
+    text-align: center;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    background-color: #007bff;
+    color: #fff;
+  }
+  
+  button:hover {
+    background-color: #0056b3;
+  }
+  
   
