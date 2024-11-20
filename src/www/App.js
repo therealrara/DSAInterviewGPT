@@ -3,7 +3,8 @@ import MarkdownRenderer from './MarkdownRenderer';
 import 'katex/dist/katex.min.css';
 import "./App.css";
 import './ChatAssistant.css';
-import Scorecard from './Scorecard'; // Import the Scorecard component
+import Scorecard from './Scorecard';
+import Spinner from './Spinner'; // Import the spinner component
 
 const ChatComponent = () => {
     const [conversation, setConversation] = useState([]); // Stores the chat history
@@ -52,30 +53,25 @@ const ChatComponent = () => {
         setIsInterviewFinished(true); // Transition to scorecard
     };
 
-    // Handle user input and stream the assistant's response
     const handleSendMessage = async () => {
         if (!message.trim()) return;
 
-        // Add user's message to the conversation immediately
         setConversation((prev) => [...prev, { role: "user", content: message }]);
         setMessage(""); // Clear input
         setLoading(true);
 
         try {
-            // Send a POST request to initiate the SSE chat response
             const response = await fetch('/api/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ prompt: message }), // Send user input in the request body
+                body: JSON.stringify({ prompt: message }),
             });
 
             if (!response.ok) {
                 throw new Error('Failed to initiate SSE connection.');
             }
 
-            // Create SSE connection to stream the response
             const eventSource = new EventSource('/api/chat/sse');
-
             let assistantResponse = "";
 
             eventSource.onmessage = (event) => {
@@ -83,13 +79,12 @@ const ChatComponent = () => {
                     setLoading(false);
                     eventSource.close();
 
-                    // Add assistant's full response to the conversation
                     setConversation((prev) => [
                         ...prev,
                         { role: "assistant", content: assistantResponse },
                     ]);
                 } else {
-                    assistantResponse += event.data + "\n"; // Incrementally append data
+                    assistantResponse += event.data + "\n";
                 }
             };
 
@@ -116,15 +111,20 @@ const ChatComponent = () => {
             {!isInterviewStarted && !isInterviewFinished && (
                 <>
                     <h1>Click for Free DSA Mock Interview</h1>
-                    <button onClick={handleStartInterview} disabled={loading}>
-                        {loading ? "Loading..." : "Start Interview"}
-                    </button>
+                    {loading ? (
+                        <Spinner /> // Show spinner while loading
+                    ) : (
+                        <button onClick={handleStartInterview} disabled={loading}>
+                            Start Interview
+                        </button>
+                    )}
                 </>
             )}
 
             {isInterviewStarted && !isInterviewFinished && (
                 <>
                     <h1>DSA Interview Session</h1>
+                    {loading && <Spinner />} {/* Show spinner while streaming response */}
                 </>
             )}
 
