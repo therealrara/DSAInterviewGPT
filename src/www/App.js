@@ -1,19 +1,23 @@
 import React, { useState } from "react";
-import ReactMarkdown from "react-markdown";
 import MarkdownRenderer from './MarkdownRenderer';
-import 'katex/dist/katex.min.css'; 
+import 'katex/dist/katex.min.css';
 import "./App.css";
 import './ChatAssistant.css';
+import Scorecard from './Scorecard'; // Import the Scorecard component
 
 const ChatComponent = () => {
     const [conversation, setConversation] = useState([]); // Stores the chat history
     const [message, setMessage] = useState(""); // Current user input
     const [loading, setLoading] = useState(false); // Loading state for SSE
+    const [isInterviewStarted, setIsInterviewStarted] = useState(false); // Track if interview has started
+    const [isInterviewFinished, setIsInterviewFinished] = useState(false); // Track if interview has ended
 
     // Start the interview and stream the first response
     const handleStartInterview = () => {
         setConversation([]); // Reset conversation
         setLoading(true);
+        setIsInterviewStarted(true); // Mark the interview as started
+        setIsInterviewFinished(false); // Reset finished state
 
         const eventSource = new EventSource("/api/startInterview");
         let assistantResponse = "";
@@ -36,8 +40,16 @@ const ChatComponent = () => {
         eventSource.onerror = (error) => {
             console.error("Error with SSE (startInterview):", error);
             setLoading(false);
+            setIsInterviewStarted(false); // Reset state if error occurs
             eventSource.close();
         };
+    };
+
+    // Handle ending the interview
+    const handleEndInterview = () => {
+        setIsInterviewStarted(false); // Mark the interview as ended
+        setLoading(false); // Stop any loading
+        setIsInterviewFinished(true); // Transition to scorecard
     };
 
     // Handle user input and stream the assistant's response
@@ -77,7 +89,7 @@ const ChatComponent = () => {
                         { role: "assistant", content: assistantResponse },
                     ]);
                 } else {
-                    assistantResponse += event.data+ "\n"; // Incrementally append data
+                    assistantResponse += event.data + "\n"; // Incrementally append data
                 }
             };
 
@@ -92,36 +104,63 @@ const ChatComponent = () => {
         }
     };
 
+    const handleRestartInterview = () => {
+        setConversation([]);
+        setMessage("");
+        setIsInterviewStarted(false);
+        setIsInterviewFinished(false);
+    };
 
     return (
         <div className="chat-container">
-            <h1>Chat with GPT-4</h1>
-            <button onClick={handleStartInterview} disabled={loading}>
-                {loading ? "Loading..." : "Start Interview"}
-            </button>
-            <div className="chat-window">
-                {conversation.map((entry, index) => (
-                    <div
-                        key={index}
-                        className={entry.role === "user" ? "chat-user" : "chat-assistant"}
-                    >
-                        <MarkdownRenderer markdownContent={entry.content}/>
-                        {/* <ReactMarkdown>{entry.content}</ReactMarkdown> */}
+            {!isInterviewStarted && !isInterviewFinished && (
+                <>
+                    <h1>Click for Free DSA Mock Interview</h1>
+                    <button onClick={handleStartInterview} disabled={loading}>
+                        {loading ? "Loading..." : "Start Interview"}
+                    </button>
+                </>
+            )}
+
+            {isInterviewStarted && !isInterviewFinished && (
+                <>
+                    <h1>DSA Interview Session</h1>
+                </>
+            )}
+
+            {isInterviewStarted && (
+                <>
+                    <div className="chat-window">
+                        {conversation.map((entry, index) => (
+                            <div
+                                key={index}
+                                className={entry.role === "user" ? "chat-user" : "chat-assistant"}
+                            >
+                                <MarkdownRenderer markdownContent={entry.content}/>
+                            </div>
+                        ))}
                     </div>
-                ))}
-            </div>
-            <textarea
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                placeholder="Type your message here..."
-                rows="4"
-                cols="50"
-                disabled={loading}
-            />
-            <br />
-            <button onClick={handleSendMessage} disabled={loading || !message.trim()}>
-                Submit Response
-            </button>
+                    <textarea
+                        value={message}
+                        onChange={(e) => setMessage(e.target.value)}
+                        placeholder="Type your message here..."
+                        rows="4"
+                        cols="50"
+                        disabled={loading}
+                    />
+                    <br />
+                    <button onClick={handleSendMessage} disabled={loading || !message.trim()}>
+                        Submit Response
+                    </button>
+                    <button onClick={handleEndInterview} disabled={loading} className="end-interview-button">
+                        End Interview
+                    </button>
+                </>
+            )}
+
+            {isInterviewFinished && (
+                <Scorecard conversation={conversation} onRestart={handleRestartInterview} />
+            )}
         </div>
     );
 };
