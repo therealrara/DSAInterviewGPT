@@ -4,21 +4,23 @@ import 'katex/dist/katex.min.css';
 import "./App.css";
 import './ChatAssistant.css';
 import Scorecard from './Scorecard';
-import Spinner from './Spinner'; // Import the spinner component
+import Spinner from './Spinner';
+import CodingEditor from "./CodeEditor";
 
 const ChatComponent = () => {
-    const [conversation, setConversation] = useState([]); // Stores the chat history
-    const [message, setMessage] = useState(""); // Current user input
-    const [loading, setLoading] = useState(false); // Loading state for SSE
-    const [isInterviewStarted, setIsInterviewStarted] = useState(false); // Track if interview has started
-    const [isInterviewFinished, setIsInterviewFinished] = useState(false); // Track if interview has ended
+    const [conversation, setConversation] = useState([]);
+    const [message, setMessage] = useState("");
+    const [loading, setLoading] = useState(false);
+    const [isInterviewStarted, setIsInterviewStarted] = useState(false);
+    const [isInterviewFinished, setIsInterviewFinished] = useState(false);
+    const [isChatLoading, setIsChatLoading] = useState(false);
+    const [code, setCode] = useState("// Write your code here");
 
-    // Start the interview and stream the first response
     const handleStartInterview = () => {
-        setConversation([]); // Reset conversation
+        setConversation([]);
         setLoading(true);
-        setIsInterviewStarted(true); // Mark the interview as started
-        setIsInterviewFinished(false); // Reset finished state
+        setIsInterviewStarted(true);
+        setIsInterviewFinished(false);
 
         const eventSource = new EventSource("/api/startInterview");
         let assistantResponse = "";
@@ -28,37 +30,34 @@ const ChatComponent = () => {
                 setLoading(false);
                 eventSource.close();
 
-                // Add assistant's full response to the conversation
                 setConversation((prev) => [
                     ...prev,
                     { role: "assistant", content: assistantResponse },
                 ]);
             } else {
-                assistantResponse += event.data + "\n"; // Incrementally append data
+                assistantResponse += event.data + "\n";
             }
         };
 
         eventSource.onerror = (error) => {
             console.error("Error with SSE (startInterview):", error);
             setLoading(false);
-            setIsInterviewStarted(false); // Reset state if error occurs
+            setIsInterviewStarted(false);
             eventSource.close();
         };
     };
 
-    // Handle ending the interview
     const handleEndInterview = () => {
-        setIsInterviewStarted(false); // Mark the interview as ended
-        setLoading(false); // Stop any loading
-        setIsInterviewFinished(true); // Transition to scorecard
+        setIsInterviewStarted(false);
+        setLoading(false);
+        setIsInterviewFinished(true);
     };
 
     const handleSendMessage = async () => {
         if (!message.trim()) return;
-
         setConversation((prev) => [...prev, { role: "user", content: message }]);
-        setMessage(""); // Clear input
-        setLoading(true);
+        setMessage("");
+        setIsChatLoading(true);
 
         try {
             const response = await fetch('/api/chat', {
@@ -76,7 +75,7 @@ const ChatComponent = () => {
 
             eventSource.onmessage = (event) => {
                 if (event.data === "[DONE]") {
-                    setLoading(false);
+                    setIsChatLoading(false);
                     eventSource.close();
 
                     setConversation((prev) => [
@@ -90,12 +89,12 @@ const ChatComponent = () => {
 
             eventSource.onerror = (error) => {
                 console.error("Error with SSE (chat):", error);
-                setLoading(false);
+                setIsChatLoading(false);
                 eventSource.close();
             };
         } catch (error) {
             console.error("Error sending message:", error);
-            setLoading(false);
+            setIsChatLoading(false);
         }
     };
 
@@ -109,53 +108,64 @@ const ChatComponent = () => {
     return (
         <div className="chat-container">
             {!isInterviewStarted && !isInterviewFinished && (
-                <>
+                <div className="initial-screen">
                     <h1>Click for Free DSA Mock Interview</h1>
                     {loading ? (
-                        <Spinner /> // Show spinner while loading
+                        <Spinner />
                     ) : (
                         <button onClick={handleStartInterview} disabled={loading}>
                             Start Interview
                         </button>
                     )}
-                </>
-            )}
-
-            {isInterviewStarted && !isInterviewFinished && (
-                <>
-                    <h1>DSA Interview Session</h1>
-                    {loading && <Spinner />} {/* Show spinner while streaming response */}
-                </>
+                </div>
             )}
 
             {isInterviewStarted && (
-                <>
-                    <div className="chat-window">
-                        {conversation.map((entry, index) => (
-                            <div
-                                key={index}
-                                className={entry.role === "user" ? "chat-user" : "chat-assistant"}
-                            >
-                                <MarkdownRenderer markdownContent={entry.content}/>
-                            </div>
-                        ))}
+                <div className="interview-session">
+                    <div className="chat-section">
+                        <h2>Chat</h2>
+                        <div className="chat-window">
+                            {conversation.map((entry, index) => (
+                                <div
+                                    key={index}
+                                    className={entry.role === "user" ? "chat-user" : "chat-assistant"}
+                                >
+                                    <MarkdownRenderer markdownContent={entry.content} />
+                                </div>
+                            ))}
+                            {isChatLoading && (
+                                <div className="loading-message">
+                                    <Spinner /> {}
+                                </div>
+                            )}
+                        </div>
+                        <textarea
+                            value={message}
+                            onChange={(e) => setMessage(e.target.value)}
+                            placeholder="Type your message here..."
+                            rows="4"
+                            cols="50"
+                            disabled={isChatLoading}
+                        />
+                        <button onClick={handleSendMessage} disabled={isChatLoading || !message.trim()}>
+                            Submit Response
+                        </button>
+                        <button onClick={handleEndInterview} disabled={isChatLoading} className="end-interview-button">
+                            End Interview
+                        </button>
                     </div>
-                    <textarea
-                        value={message}
-                        onChange={(e) => setMessage(e.target.value)}
-                        placeholder="Type your message here..."
-                        rows="4"
-                        cols="50"
-                        disabled={loading}
-                    />
-                    <br />
-                    <button onClick={handleSendMessage} disabled={loading || !message.trim()}>
-                        Submit Response
-                    </button>
-                    <button onClick={handleEndInterview} disabled={loading} className="end-interview-button">
-                        End Interview
-                    </button>
-                </>
+
+                    <div className="code-editor-section">
+                        <h2>Code Editor</h2>
+                        <CodingEditor code={code} setCode={setCode} />
+                        <button
+                            onClick={() => console.log("Code Submitted:", code)}
+                            disabled={isChatLoading}
+                        >
+                            Submit Code
+                        </button>
+                    </div>
+                </div>
             )}
 
             {isInterviewFinished && (

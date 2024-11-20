@@ -34,44 +34,44 @@
 }
 
 body {
-  background-color: #f0f0f0; /* Light gray background to add contrast */
+  background-color: #f0f0f0; 
   font-family: Arial, sans-serif;
 }
 
 .markdown-container {
   padding: 20px;
-  background-color: #ffffff; /* White background to make content pop */
-  border: 1px solid #ddd; /* Soft border for more definition */
+  background-color: #ffffff;
+  border: 1px solid #ddd;
   border-radius: 8px;
   max-width: 800px;
-  margin: 40px auto; /* Center the Markdown container */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Add subtle shadow for depth */
+  margin: 40px auto;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* Text-specific styling for better readability */
+
 .markdown-container p {
-  color: #333; /* Darker text for readability */
+  color: #333;
   margin-bottom: 16px;
 }
 
 .markdown-container h1, .markdown-container h2, .markdown-container h3 {
-  color: #2c3e50; /* Darker color for headers */
+  color: #2c3e50;
   margin-bottom: 16px;
   margin-top: 24px;
 }
 
 .markdown-container code {
-  background-color: #e7e7e7; /* Gray background for inline code */
+  background-color: #e7e7e7;
   padding: 2px 4px;
   border-radius: 4px;
-  color: #c7254e; /* Red color for better contrast */
+  color: #c7254e;
 }
 
 .markdown-container pre {
-  background-color: #282c34; /* Darker color for block code */
-  color: #ffffff; /* White text for code blocks */
+  background-color: #282c34;
+  color: #ffffff;
   padding: 16px;
   border-radius: 8px;
   margin-bottom: 24px;
-  overflow-x: auto; /* Allow scrolling for long code */
+  overflow-x: auto;
 }
