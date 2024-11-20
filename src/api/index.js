@@ -90,8 +90,7 @@ app.get('/api/startInterview', async (req, res) => {
 });
 
 app.get('/api/endInterview', async (req, res) => {
-  conversationArr = []
-  let prompt = "Can You give me a DSA Coding Question? In Addition, Please do not give any approaches or hints to the candidate or give them any followups. No Edge Cases Either. Please silently take points away if candidate does not consider edge cases."
+  let prompt = "Given all the info I have shared, can you please grade this DSA interview as if you were interviewing for Meta amongst a scale of strong no hire, no hire,leans in both directions,hire, strong hire? The goal here should be to assess accurate interview performance according to faang. So I would expect a thorough explanation of the code you wrote, a thorough explanation of the edge cases, a thorough explanation of the problem, and the overall fixes to the code. If there are multiple attempts at the code, definitely use the best one to evaluate the quality of the code. If no chat history, you should default to strong no hire. If there is chat history, but no problem, still no hire. Do not give generic advice. if there's not much to work with, please say so. "
   conversationArr.push({ role: "user", content: prompt });
   if (!prompt) {
     return res.status(400).json({ error: "Prompt is required" });
@@ -221,11 +220,13 @@ app.get('/api/chat/sse', async (req, res) => {
 app.post('/api/chat', (req, res) => {
   const { prompt } = req.body;
 
+  const prompt2= prompt + " IF THE CANDIDATE HAS NOT GIVEN ANY CODE, PLEASE STRONGLY VALIDATE THEIR APPROACH AND SERIOUSLY ENSURE THEY GET SIGN OFF ON THE SOLUTION. IF THEY WRITE CODE BEFORE DISCUSSING APPROACHES, TRADEOFFS, ETC, PLEASE APPLY SEVERE PENALTIES WHEN GRADING THIS. PLEASE DO NOT GIVE THE CANDIDATE HINTS, AND ONLY INTERVENE TO CLARIFY THE REQUIREMENTS, CLARIFY THE SCENARIOS. IF YOU SEE CODE GIVEN BY THE CANDIDATE, DO NOT SPIT OUT BETTER CODE. PLEASE ASK THEM TO VERIFY THE SOLUTION. IF THEY ARE COMPLETE. PLEASE ASK IF THEY ARE DONE. IF THEY SEEM TO BE CLEARLY PASSING THE QUESTION, START ASKING THEM FOLLOWUPS OR EVEN GO DEEPER INTO THE PROBLEM. "
+
   if (!prompt) {
     return res.status(400).json({ error: "Prompt is required" });
   }
 
-  conversationArr.push({ role: "user", content: prompt });
+  conversationArr.push({ role: "user", content: prompt2 });
   res.status(200).json({ message: "Prompt received" });
 });
 
