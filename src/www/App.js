@@ -158,12 +158,6 @@ const ChatComponent = () => {
                     <div className="code-editor-section">
                         <h2>Code Editor</h2>
                         <CodingEditor code={code} setCode={setCode} />
-                        <button
-                            onClick={() => console.log("Code Submitted:", code)}
-                            disabled={isChatLoading}
-                        >
-                            Submit Code
-                        </button>
                     </div>
                 </div>
             )}

@@ -5,6 +5,8 @@ import { python } from "@codemirror/lang-python";
 
 const CodingEditor = ({ code, setCode }) => {
     const [language, setLanguage] = useState("javascript");
+    const [output, setOutput] = useState('');
+    const [showOutput, setShowOutput] = useState(false);
 
     const handleEditorChange = (value) => {
         setCode(value);
@@ -12,6 +14,36 @@ const CodingEditor = ({ code, setCode }) => {
 
     const handleLanguageChange = (e) => {
         setLanguage(e.target.value);
+    };
+
+    // Execute the JavaScript code and display output
+    const handleRunCode = () => {
+        try {
+            let logOutput = '';
+
+            // Override console.log to capture logs
+            const originalConsoleLog = console.log;
+            console.log = (...args) => {
+                logOutput += args.join(' ') + '\n';
+                originalConsoleLog.apply(console, args); // Still log to browser console
+            };
+
+            // Execute the code safely
+            // eslint-disable-next-line no-new-func
+            const result = new Function(code)();
+
+            // Restore console.log
+            console.log = originalConsoleLog;
+
+            // Set the final output (logs + result)
+            if (result !== undefined) {
+                logOutput += result.toString();
+            }
+            setOutput(logOutput.trim());
+        } catch (error) {
+            setOutput(`Error: ${error.message}`);
+        }
+        setShowOutput(true);
     };
 
     const lineHeight = 20;
@@ -65,6 +97,13 @@ const CodingEditor = ({ code, setCode }) => {
                     }}
                 />
             </div>
+            <button onClick={handleRunCode} style={{marginTop: '10px' }}>
+                Run Code
+            </button>
+            {showOutput && (<div className="output-container" style={{ marginTop: '20px' }}>
+                <h3>Output:</h3>
+                <pre>{output}</pre>
+            </div>)}
         </div>
     );
 };
