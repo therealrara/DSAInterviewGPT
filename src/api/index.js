@@ -1,6 +1,7 @@
 const express = require('express');
-const {  OpenAI } = require('openai');
 const cors = require('cors');
+const axios = require('axios');
+const { OpenAI } = require('openai');
 require('dotenv').config();
 
 const app = express();
@@ -11,6 +12,7 @@ const port = 4000;
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
+
 
 // Enable CORS if needed
 app.use((req, res, next) => {
@@ -41,11 +43,11 @@ app.get('/api/startInterview', async (req, res) => {
 
   try {
     const completion = await openai.chat.completions.create(
-        {
-          model: "gpt-4o",
-          messages: conversationArr,
-          stream: true, // Enable streaming
-        },
+      {
+        model: "gpt-4o",
+        messages: conversationArr,
+        stream: true, // Enable streaming
+      },
     );
 
     for await (const chunk of completion) {
@@ -107,11 +109,11 @@ app.get('/api/endInterview', async (req, res) => {
 
   try {
     const completion = await openai.chat.completions.create(
-        {
-          model: "gpt-4o",
-          messages: conversationArr,
-          stream: true, // Enable streaming
-        },
+      {
+        model: "gpt-4o",
+        messages: conversationArr,
+        stream: true, // Enable streaming
+      },
     );
 
     for await (const chunk of completion) {
@@ -169,11 +171,11 @@ app.get('/api/chat/sse', async (req, res) => {
 
   try {
     const completion = await openai.chat.completions.create(
-        {
-          model: "gpt-4o",
-          messages: conversationArr,
-          stream: true, // Enable streaming
-        },
+      {
+        model: "gpt-4o",
+        messages: conversationArr,
+        stream: true, // Enable streaming
+      },
     );
 
     for await (const chunk of completion) {
@@ -220,7 +222,7 @@ app.get('/api/chat/sse', async (req, res) => {
 app.post('/api/chat', (req, res) => {
   const { prompt } = req.body;
 
-  const prompt2= prompt + " IF THE CANDIDATE HAS NOT GIVEN ANY CODE, PLEASE STRONGLY VALIDATE THEIR APPROACH AND SERIOUSLY ENSURE THEY GET SIGN OFF ON THE SOLUTION. IF THEY WRITE CODE BEFORE DISCUSSING APPROACHES, TRADEOFFS, ETC, PLEASE APPLY SEVERE PENALTIES WHEN GRADING THIS. PLEASE DO NOT GIVE THE CANDIDATE HINTS, AND ONLY INTERVENE TO CLARIFY THE REQUIREMENTS, CLARIFY THE SCENARIOS. IF YOU SEE CODE GIVEN BY THE CANDIDATE, DO NOT SPIT OUT BETTER CODE. PLEASE ASK THEM TO VERIFY THE SOLUTION. IF THEY ARE COMPLETE. PLEASE ASK IF THEY ARE DONE. IF THEY SEEM TO BE CLEARLY PASSING THE QUESTION, START ASKING THEM FOLLOWUPS OR EVEN GO DEEPER INTO THE PROBLEM. "
+  const prompt2 = prompt + " IF THE CANDIDATE HAS NOT GIVEN ANY CODE, PLEASE STRONGLY VALIDATE THEIR APPROACH AND SERIOUSLY ENSURE THEY GET SIGN OFF ON THE SOLUTION. IF THEY WRITE CODE BEFORE DISCUSSING APPROACHES, TRADEOFFS, ETC, PLEASE APPLY SEVERE PENALTIES WHEN GRADING THIS. PLEASE DO NOT GIVE THE CANDIDATE HINTS, AND ONLY INTERVENE TO CLARIFY THE REQUIREMENTS, CLARIFY THE SCENARIOS. IF YOU SEE CODE GIVEN BY THE CANDIDATE, DO NOT SPIT OUT BETTER CODE. PLEASE ASK THEM TO VERIFY THE SOLUTION. IF THEY ARE COMPLETE. PLEASE ASK IF THEY ARE DONE. IF THEY SEEM TO BE CLEARLY PASSING THE QUESTION, START ASKING THEM FOLLOWUPS OR EVEN GO DEEPER INTO THE PROBLEM. "
 
   if (!prompt) {
     return res.status(400).json({ error: "Prompt is required" });
@@ -230,8 +232,63 @@ app.post('/api/chat', (req, res) => {
   res.status(200).json({ message: "Prompt received" });
 });
 
+// Define the feedback route directly using `app.post`
+app.post('/api/get-feedback', async (req, res) => {
+  const { problemDescription, userCode, userOutput } = req.body;
+
+  // Validate the incoming request body
+  if (!problemDescription || !userCode || !userOutput) {
+    return res.status(400).json({ error: 'Missing parameters in request body' });
+  }
+  const messages = [
+    { role: "system", content: "You are a helpful assistant." },
+    {
+      role: "user",
+      content: `
+Problem Description: ${problemDescription}
+
+User's Code:
+${userCode}
+
+User's Output:
+${userOutput}
+
+Evaluate the user's code and output based on the problem description. Provide feedback on:
+1. Whether the user's solution is correct.
+2. If incorrect, provide hints on what might be wrong.
+3. Suggest improvements or optimizations for the code, if possible.
+`,
+    },
+  ];
+
+  try {
+    // Call the OpenAI API
+    const response = await axios.post(
+      'https://api.openai.com/v1/chat/completions',
+      {
+        model: 'gpt-4',
+        messages: messages,
+        max_tokens: 300,
+        temperature: 0.5,
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+        },
+      }
+    );
+
+    // Send the response back to the client
+    res.json({ feedback: response.data.choices[0].message });
+  } catch (error) {
+    console.error('Error calling OpenAI API:', error.message);
+    res.status(500).json({ error: 'Failed to get feedback from OpenAI.' });
+  }
+});
 
 // Start the server
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });
+
