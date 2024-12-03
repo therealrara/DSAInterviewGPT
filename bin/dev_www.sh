@@ -1,3 +1,11 @@
 #!/usr/bin/env bash
 export NODE_OPTIONS=--openssl-legacy-provider
-./node_modules/.bin/react-scripts start
+
+# Install dependencies
+yarn install
+
+# Build the production app
+yarn build
+
+# Serve the production build
+npx serve -s build -l $PORT
