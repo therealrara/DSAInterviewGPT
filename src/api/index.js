@@ -7,7 +7,7 @@ require('dotenv').config();
 const app = express();
 app.use(cors());
 app.use(express.json()); // Add this to parse JSON bodies
-const port = 4000;
+const port = process.env.PORT;
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
