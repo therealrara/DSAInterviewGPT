@@ -10,4 +10,4 @@ yarn install
 yarn build
 
 # Serve the production build on Heroku's dynamic PORT
-npx serve -s build -l ${PORT:-5000}  # Fallback to port 5000 if PORT is not set
+npx serve -s build -l ${PORT:-5006}  # Fallback to port 5000 if PORT is not set
