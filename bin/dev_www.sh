@@ -7,5 +7,5 @@ yarn install
 # Build the production app
 yarn build
 
-# Serve the production build
-npx serve -s build
+# Serve the production build on Heroku's dynamic PORT
+npx serve -s build -l $PORT
