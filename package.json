@@ -48,6 +48,10 @@
     "eject-www": "react-scripts eject",
     "heroku-postbuild": "bash bin/dev_www.sh"
   },
+  "engines": {
+    "node": "18.x",
+    "npm": "8.x"
+  },
   "eslintConfig": {
     "extends": "react-app"
   },
