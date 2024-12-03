@@ -8,4 +8,4 @@ yarn install
 yarn build
 
 # Serve the production build
-npx serve -s build -l $PORT
+npx serve -s build
