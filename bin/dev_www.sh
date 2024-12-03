@@ -1,13 +1,14 @@
 #!/usr/bin/env bash
 export NODE_OPTIONS=--openssl-legacy-provider
-# Debug: Print the PORT variable
-echo "Using PORT: $PORT"
 
-# Install dependencies
+# Navigate to the React app folder
+cd src/www
+
+# Install frontend dependencies
 yarn install
 
-# Build the production app
+# Build the React app for production
 yarn build
 
-# Serve the production build on Heroku's dynamic PORT
-npx serve -s build -l ${PORT:-5006}  # Fallback to port 5000 if PORT is not set
+# Serve the production build on the PORT provided by Heroku
+npx serve -s build -l ${PORT:-5006}
