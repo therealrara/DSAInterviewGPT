@@ -23,6 +23,7 @@
     "react-scripts": "3.0.1",
     "rehype-katex": "5",
     "remark-math": "3",
+    "serve": "^14.2.4",
     "vfile": "5"
   },
   "devDependencies": {
