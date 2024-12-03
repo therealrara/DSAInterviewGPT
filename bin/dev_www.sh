@@ -2,7 +2,7 @@
 export NODE_OPTIONS=--openssl-legacy-provider
 
 # Navigate to the React app folder
-cd src/www
+cd ../src/www
 
 # Install frontend dependencies
 yarn install

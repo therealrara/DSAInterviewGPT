@@ -42,12 +42,11 @@
     "prettier": "^1.17.1"
   },
   "scripts": {
-    "start": "bash bin/dev.sh",
-    "build": "react-scripts build",
-    "deploy": "deploy-node-app",
-    "test": "react-scripts test",
-    "eject-www": "react-scripts eject",
-    "heroku-postbuild": "bash bin/dev_www.sh"
+    "start": "node src/api/index.js",
+    "build": "export NODE_OPTIONS=--openssl-legacy-provider && react-scripts build",
+    "build-www": "cd src/www && yarn build",
+    "heroku-postbuild": "yarn build-www",
+    "start-www": "npx serve -s build"
   },
   "engines": {
     "node": "18.x",
