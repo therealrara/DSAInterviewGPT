@@ -3,13 +3,15 @@ import './Scorecard.css';
 import MarkdownRenderer from "./MarkdownRenderer";
 import Spinner from "./Spinner"; // Import the spinner component
 
+const API_URL = process.env.REACT_APP_API_URL
+
 const Scorecard = ({ conversation, onRestart }) => {
     const [loading, setLoading] = useState(false); // Loading state for feedback
     const [feedback, setFeedback] = useState([]); // Feedback from the assistant
 
     const fetchFeedback = () => {
         setLoading(true); // Show spinner while loading
-        const eventSource = new EventSource("/api/endInterview");
+        const eventSource = new EventSource(API_URL + "/api/endInterview");
         let assistantResponse = "";
 
         eventSource.onmessage = (event) => {

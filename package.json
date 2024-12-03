@@ -42,7 +42,7 @@
     "prettier": "^1.17.1"
   },
   "scripts": {
-    "start": "npx serve -s build -l $PORT",
+    "start": "npx serve -s build -l 5006",
     "build": "export NODE_OPTIONS=--openssl-legacy-provider && react-scripts build",
     "build-www": "cd src/www && yarn build",
     "heroku-postbuild": "yarn build-www",

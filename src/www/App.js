@@ -6,6 +6,11 @@ import './ChatAssistant.css';
 import Scorecard from './Scorecard';
 import Spinner from './Spinner';
 import CodingEditor from "./CodeEditor";
+require('dotenv').config();
+
+const API_URL = process.env.REACT_APP_API_URL
+
+console.log(API_URL);
 
 const ChatComponent = () => {
     const [conversation, setConversation] = useState([]);
@@ -21,8 +26,8 @@ const ChatComponent = () => {
         setLoading(true);
         setIsInterviewStarted(true);
         setIsInterviewFinished(false);
-
-        const eventSource = new EventSource("/api/startInterview");
+        console.log(API_URL);
+        const eventSource = new EventSource(API_URL + "/api/startInterview");
         let assistantResponse = "";
 
         eventSource.onmessage = (event) => {
@@ -60,7 +65,7 @@ const ChatComponent = () => {
         setIsChatLoading(true);
 
         try {
-            const response = await fetch('/api/chat', {
+            const response = await fetch(API_URL + 'api/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ prompt: message }),
@@ -70,7 +75,7 @@ const ChatComponent = () => {
                 throw new Error('Failed to initiate SSE connection.');
             }
 
-            const eventSource = new EventSource('/api/chat/sse');
+            const eventSource = new EventSource(API_URL + 'api/chat/sse');
             let assistantResponse = "";
 
             eventSource.onmessage = (event) => {
