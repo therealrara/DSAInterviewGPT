@@ -46,7 +46,7 @@
     "deploy": "deploy-node-app",
     "test": "react-scripts test",
     "eject-www": "react-scripts eject",
-    "heroku-postbuild": "bash bin/dev.sh"
+    "heroku-postbuild": "bash bin/dev_www.sh"
   },
   "eslintConfig": {
     "extends": "react-app"
