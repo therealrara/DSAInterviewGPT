@@ -3,6 +3,7 @@ import CodeMirror from "@uiw/react-codemirror";
 import { javascript } from "@codemirror/lang-javascript";
 import { python } from "@codemirror/lang-python";
 
+const API_URL = process.env.REACT_APP_API_URL
 
 const CodingEditor = ({ code, setCode }) => {
     const [output, setOutput] = useState('');
@@ -127,7 +128,7 @@ const CodingEditor = ({ code, setCode }) => {
         const { userCode, problemDescription, userOutput } = getCodeAndOutput();
       
         try {
-          const response = await fetch('http://localhost:4000/api/get-feedback', {
+          const response = await fetch(API_URL + '/api/get-feedback', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
