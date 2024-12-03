@@ -17,6 +17,10 @@ You will also see any lint errors in the console.
 Launches the test runner in the interactive watch mode.<br>
 See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
+## NOTE:
+In order to actually hit the OpenAI API, you need to generate an API key. There is a [quick start page here](https://platform.openai.com/docs/quickstart) that will provide you with a link to create you API key.
+Also make sure you aware of which model you are going to use when making the API calls. There are instances in the repo where `model` is referenced, so make sure you set that to the appropriate model per your subscription.
+
 ### `npm run build`
 
 Builds the app for production to the `build` folder.<br>
