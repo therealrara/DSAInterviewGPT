@@ -46,7 +46,7 @@
     "build": "export NODE_OPTIONS=--openssl-legacy-provider && react-scripts build",
     "build-www": "cd src/www && yarn build",
     "heroku-postbuild": "yarn build-www",
-    "start-www": "npx serve -s build"
+    "start-www": "npx serve -s build -l 5006"
   },
   "engines": {
     "node": "18.x",
