@@ -276,32 +276,7 @@ Evaluate the user's code and output based on the problem description. Provide fe
     },
   ];
   conversationArr.push(messages[0])
-  try {
-    // Call the OpenAI API
-    const response = await axios.post(
-      'https://api.openai.com/v1/chat/completions',
-      {
-        model: 'gpt-4',
-        messages: messages,
-        max_tokens: 300,
-        temperature: 0.5,
-      },
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-        },
-      }
-    );
-    const message = response.data.choices[0].message
-    conversationArr.push({ role: "assistant", content: message })
-
-    // Send the response back to the client
-    res.json({ feedback: message });
-  } catch (error) {
-    console.error('Error calling OpenAI API:', error.message);
-    res.status(500).json({ error: 'Failed to get feedback from OpenAI.' });
-  }
+  res.status(200).json({ message: "Prompt received" });
 });
 
 // Start the server

@@ -65,7 +65,7 @@ const ChatComponent = () => {
         setIsChatLoading(true);
 
         try {
-            const response = await fetch(API_URL + 'api/chat', {
+            const response = await fetch(API_URL + '/api/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ prompt: message }),
@@ -75,7 +75,7 @@ const ChatComponent = () => {
                 throw new Error('Failed to initiate SSE connection.');
             }
 
-            const eventSource = new EventSource(API_URL + 'api/chat/sse');
+            const eventSource = new EventSource(API_URL + '/api/chat/sse');
             let assistantResponse = "";
 
             eventSource.onmessage = (event) => {
