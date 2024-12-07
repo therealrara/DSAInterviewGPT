@@ -14,6 +14,7 @@ console.log(API_URL);
 
 const ChatComponent = () => {
     const [conversation, setConversation] = useState([]);
+    const [interviewId, setInterviewId] = useState("");
     const [message, setMessage] = useState("");
     const [loading, setLoading] = useState(false);
     const [isInterviewStarted, setIsInterviewStarted] = useState(false);
@@ -21,13 +22,26 @@ const ChatComponent = () => {
     const [isChatLoading, setIsChatLoading] = useState(false);
     const [code, setCode] = useState("// Write your code here");
 
-    const handleStartInterview = () => {
+    const handleStartInterview = async () => {
+        setInterviewId("");
         setConversation([]);
         setLoading(true);
         setIsInterviewStarted(true);
         setIsInterviewFinished(false);
         console.log(API_URL);
-        const eventSource = new EventSource(API_URL + "/api/startInterview");
+        const response = await fetch(API_URL + '/api/startInterview', {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' },
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to initiate SSE connection.');
+        }
+        const body = await response.json()
+        console.log(body);
+        setInterviewId(body.interviewId);
+        const path = `/api/chat/${body.interviewId}/sse`
+        const eventSource = new EventSource(API_URL + path);
         let assistantResponse = "";
 
         eventSource.onmessage = (event) => {
@@ -64,8 +78,10 @@ const ChatComponent = () => {
         setMessage("");
         setIsChatLoading(true);
 
+        const path = `/api/chat/${interviewId}`
+
         try {
-            const response = await fetch(API_URL + '/api/chat', {
+            const response = await fetch(API_URL + path, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ prompt: message }),
@@ -75,7 +91,7 @@ const ChatComponent = () => {
                 throw new Error('Failed to initiate SSE connection.');
             }
 
-            const eventSource = new EventSource(API_URL + '/api/chat/sse');
+            const eventSource = new EventSource(API_URL + path + '/sse');
             let assistantResponse = "";
 
             eventSource.onmessage = (event) => {
@@ -168,7 +184,7 @@ const ChatComponent = () => {
             )}
 
             {isInterviewFinished && (
-                <Scorecard conversation={conversation} onRestart={handleRestartInterview} />
+                <Scorecard interviewId={interviewId} conversation={conversation} onRestart={handleRestartInterview} />
             )}
         </div>
     );

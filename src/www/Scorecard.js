@@ -5,13 +5,22 @@ import Spinner from "./Spinner"; // Import the spinner component
 
 const API_URL = process.env.REACT_APP_API_URL
 
-const Scorecard = ({ conversation, onRestart }) => {
+const Scorecard = ({ interviewId, conversation, onRestart }) => {
     const [loading, setLoading] = useState(false); // Loading state for feedback
     const [feedback, setFeedback] = useState([]); // Feedback from the assistant
 
-    const fetchFeedback = () => {
+    const fetchFeedback = async () => {
         setLoading(true); // Show spinner while loading
-        const eventSource = new EventSource(API_URL + "/api/endInterview");
+        const response = await fetch(API_URL + `/api/endInterview/${interviewId}`, {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' }
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to initiate SSE connection.');
+        }
+        const path = `/api/chat/${interviewId}/sse`
+        const eventSource = new EventSource(API_URL + path);
         let assistantResponse = "";
 
         eventSource.onmessage = (event) => {
