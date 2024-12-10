@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, {useEffect, useState} from "react";
 import MarkdownRenderer from './MarkdownRenderer';
 import 'katex/dist/katex.min.css';
 import "./App.css";
@@ -12,12 +12,12 @@ const API_URL = process.env.REACT_APP_API_URL
 
 console.log(API_URL);
 
-const ChatComponent = () => {
+const ChatComponent = ({setIsLoggedIn}) => {
     const [conversation, setConversation] = useState([]);
     const [interviewId, setInterviewId] = useState("");
     const [message, setMessage] = useState("");
-    const [loading, setLoading] = useState(false);
-    const [isInterviewStarted, setIsInterviewStarted] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [isInterviewStarted, setIsInterviewStarted] = useState(true);
     const [isInterviewFinished, setIsInterviewFinished] = useState(false);
     const [isChatLoading, setIsChatLoading] = useState(false);
     const [code, setCode] = useState("// Write your code here");
@@ -119,28 +119,22 @@ const ChatComponent = () => {
         }
     };
 
+    useEffect(() => {
+        if (isInterviewStarted) {
+            handleStartInterview().then(r => console.log(""));
+        }
+    },[isInterviewStarted])
+
     const handleRestartInterview = () => {
         setConversation([]);
         setMessage("");
-        setIsInterviewStarted(false);
+        setIsInterviewStarted(true);
         setIsInterviewFinished(false);
     };
 
     return (
         <div className="chat-container">
-            {!isInterviewStarted && !isInterviewFinished && (
-                <div className="initial-screen">
-                    <h1>Click for Free DSA Mock Interview</h1>
-                    {loading ? (
-                        <Spinner />
-                    ) : (
-                        <button onClick={handleStartInterview} disabled={loading}>
-                            Start Interview
-                        </button>
-                    )}
-                </div>
-            )}
-
+            <button onClick={() => setIsLoggedIn(false)}>Logout</button>
             {isInterviewStarted && (
                 <div className="interview-session">
                     <div className="chat-section">
