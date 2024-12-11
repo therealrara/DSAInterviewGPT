@@ -1,17 +1,19 @@
 import React, { useState } from "react";
 import './Scorecard.css';
 import MarkdownRenderer from "./MarkdownRenderer";
-import Spinner from "./Spinner"; // Import the spinner component
+import Spinner from "./Spinner";
+import {useNavigate} from "react-router"; // Import the spinner component
 
 const API_URL = process.env.REACT_APP_API_URL
 
 const Scorecard = ({ interviewId, conversation, onRestart }) => {
     const [loading, setLoading] = useState(false); // Loading state for feedback
     const [feedback, setFeedback] = useState([]); // Feedback from the assistant
-
+    const userId = localStorage.getItem("userId");
+    const navigate = useNavigate();
     const fetchFeedback = async () => {
         setLoading(true); // Show spinner while loading
-        const response = await fetch(API_URL + `/api/endInterview/${interviewId}`, {
+        const response = await fetch(API_URL + `/interview/${userId}/endInterview/${interviewId}`, {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' }
         });
@@ -19,7 +21,7 @@ const Scorecard = ({ interviewId, conversation, onRestart }) => {
         if (!response.ok) {
             throw new Error('Failed to initiate SSE connection.');
         }
-        const path = `/api/chat/${interviewId}/sse`
+        const path = `/interview/${userId}/chat/${interviewId}/sse`
         const eventSource = new EventSource(API_URL + path);
         let assistantResponse = "";
 
@@ -92,6 +94,7 @@ const Scorecard = ({ interviewId, conversation, onRestart }) => {
                 ))}
             </div>
             <button onClick={onRestart}>Restart Interview</button>
+            <button onClick={() => navigate("/")}>Main Menu</button>
         </div>
     );
 };

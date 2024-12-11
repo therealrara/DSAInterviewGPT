@@ -6,6 +6,8 @@ import './ChatAssistant.css';
 import Scorecard from './Scorecard';
 import Spinner from './Spinner';
 import CodingEditor from "./CodeEditor";
+import {useNavigate} from "react-router";
+import { useLocation, useParams } from "react-router-dom";
 require('dotenv').config();
 
 const API_URL = process.env.REACT_APP_API_URL
@@ -13,34 +15,26 @@ const API_URL = process.env.REACT_APP_API_URL
 console.log(API_URL);
 
 const ChatComponent = ({setIsLoggedIn}) => {
+    const location = useLocation();
+    const isNewInterview = location.state?.isNewInterview || false; // Default to false if not provided
     const [conversation, setConversation] = useState([]);
-    const [interviewId, setInterviewId] = useState("");
+    const { interviewId } = useParams();
     const [message, setMessage] = useState("");
     const [loading, setLoading] = useState(true);
     const [isInterviewStarted, setIsInterviewStarted] = useState(true);
     const [isInterviewFinished, setIsInterviewFinished] = useState(false);
     const [isChatLoading, setIsChatLoading] = useState(false);
     const [code, setCode] = useState("// Write your code here");
+    const userId = localStorage.getItem("userId"); // Retrieve userId from localStorage
+    const navigate = useNavigate();
 
     const handleStartInterview = async () => {
-        setInterviewId("");
         setConversation([]);
         setLoading(true);
         setIsInterviewStarted(true);
         setIsInterviewFinished(false);
-        console.log(API_URL);
-        const response = await fetch(API_URL + '/api/startInterview', {
-            method: 'GET',
-            headers: { 'Content-Type': 'application/json' },
-        });
 
-        if (!response.ok) {
-            throw new Error('Failed to initiate SSE connection.');
-        }
-        const body = await response.json()
-        console.log(body);
-        setInterviewId(body.interviewId);
-        const path = `/api/chat/${body.interviewId}/sse`
+        const path = `/interview/${userId}/chat/${interviewId}/sse`
         const eventSource = new EventSource(API_URL + path);
         let assistantResponse = "";
 
@@ -72,13 +66,29 @@ const ChatComponent = ({setIsLoggedIn}) => {
         setIsInterviewFinished(true);
     };
 
+    const handleResumeInterview = async () => {
+        console.log(API_URL);
+        const response = await fetch(API_URL + `/interview/${userId}/resumeInterview/${interviewId}`, {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' },
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to initiate SSE connection.');
+        }
+        const body = await response.json()
+        setConversation(([]) => {
+            return body.records;
+        })
+    }
+
     const handleSendMessage = async () => {
         if (!message.trim()) return;
         setConversation((prev) => [...prev, { role: "user", content: message }]);
         setMessage("");
         setIsChatLoading(true);
 
-        const path = `/api/chat/${interviewId}`
+        const path = `/interview/${userId}/chat/${interviewId}`
 
         try {
             const response = await fetch(API_URL + path, {
@@ -120,10 +130,12 @@ const ChatComponent = ({setIsLoggedIn}) => {
     };
 
     useEffect(() => {
-        if (isInterviewStarted) {
+        if (isNewInterview) {
             handleStartInterview().then(r => console.log(""));
+        } else {
+            handleResumeInterview().then(r => console.log(""));
         }
-    },[isInterviewStarted])
+    },[isNewInterview])
 
     const handleRestartInterview = () => {
         setConversation([]);
@@ -135,6 +147,7 @@ const ChatComponent = ({setIsLoggedIn}) => {
     return (
         <div className="chat-container">
             <button onClick={() => setIsLoggedIn(false)}>Logout</button>
+            <button onClick={() => navigate("/")}>Main Menu</button>
             {isInterviewStarted && (
                 <div className="interview-session">
                     <div className="chat-section">
