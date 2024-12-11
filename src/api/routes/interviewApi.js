@@ -9,9 +9,6 @@ const asyncHandler = (fn) => (req, res, next) => {
 };
 
 console.log(process.env)
-const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
-});
 
 router.get('/:userId/startInterview', asyncHandler(async (req, res) => {
     const interviewId = v4();
@@ -19,7 +16,7 @@ router.get('/:userId/startInterview', asyncHandler(async (req, res) => {
     console.log(interviewId);
     await req.db('interviews').insert({interview_id: interviewId, in_progress: true, user_id: userId});
     let prompt = "Can You give me a DSA Coding Question? In Addition, Please do not give any approaches or hints to the candidate or give them any followups. No Edge Cases Either. Please silently take points away if candidate does not consider edge cases."
-    await addObjectToArray(interviewId, { role: "user", content: prompt, backendPrompt: true});
+    await addObjectToArray(interviewId, { role: "user", content: prompt, backendPrompt: true, startPrompt: true});
     res.status(200).json({ message: "Prompt received",interviewId: interviewId});
 }));
 
@@ -49,7 +46,7 @@ router.get('/:userId/endInterview/:interviewId', asyncHandler(async (req, res) =
         return res.status(401).json({ error: 'Unauthorized: Invalid user or interview ID' });
     }
     let prompt = "Given all the info I have shared, can you please grade this DSA interview as if you were interviewing for Meta amongst a scale of strong no hire, no hire,leans in both directions,hire, strong hire? The goal here should be to assess accurate interview performance according to faang. So I would expect a thorough explanation of the code you wrote, a thorough explanation of the edge cases, a thorough explanation of the problem, and the overall fixes to the code. If there are multiple attempts at the code, definitely use the best one to evaluate the quality of the code. If no chat history, you should default to strong no hire. If there is chat history, but no problem, still no hire. Do not give generic advice. if there's not much to work with, please say so. "
-    await addObjectToArray(interviewId,{ role: "user", content: prompt , backendPrompt: false});
+    await addObjectToArray(interviewId,{ role: "user", content: prompt , backendPrompt: false, startPrompt: false});
     if (!prompt) {
         return res.status(400).json({ error: "Prompt is required" });
     }
@@ -91,79 +88,9 @@ router.post('/:userId/chat/:interviewId', asyncHandler(async (req, res) => {
     if (!prompt) {
         return res.status(400).json({ error: "Prompt is required" });
     }
-    await addObjectToArray(interviewId, {role: "user", content: prompt,backendPrompt: false});
-    await addObjectToArray(interviewId, {role: "user", content: prompt2,backendPrompt: true})
+    await addObjectToArray(interviewId, {role: "user", content: prompt,backendPrompt: false, startPrompt: false});
+    await addObjectToArray(interviewId, {role: "user", content: prompt2,backendPrompt: true, startPrompt: false})
     res.status(200).json({ message: "Prompt received" });
-}));
-
-router.get('/:userId/chat/:interviewId/sse', asyncHandler(async (req, res) => {
-
-    const interviewId = req.params.interviewId;
-    const userId = req.params.userId;
-    const existingRecord = await req.db('interviews')
-        .where({ user_id: userId, interview_id: interviewId })
-        .first();
-
-    if (!existingRecord) {
-        return res.status(401).json({ error: 'Unauthorized: Invalid user or interview ID' });
-    }
-    let fullResponse = '';
-    let chunkBuffer = '';
-    res.setHeader('Content-Type', 'text/event-stream');
-    res.setHeader('Cache-Control', 'no-cache');
-    res.setHeader('Connection', 'keep-alive');
-    res.setHeader('Content-Encoding', 'identity');
-    res.flushHeaders(); // Im
-
-
-    try {
-        const completion = await openai.chat.completions.create(
-            {
-                model: "gpt-4o",
-                messages: await getCurrentArray(interviewId),
-                stream: true, // Enable streaming
-            },
-        );
-
-        for await (const chunk of completion) {
-            const content = chunk.choices[0]?.delta?.content;
-            if (content) {
-                // Accumulate full response for storing
-                fullResponse += content;
-
-                // Append to chunkBuffer for streaming
-                chunkBuffer += content;
-
-                // Check for natural breaks (newlines or double newlines)
-                if (chunkBuffer.includes('\n')) {
-                    const lines = chunkBuffer.split('\n'); // Split into lines
-
-                    // Send all complete lines, keep the last incomplete line in the buffer
-                    for (let i = 0; i < lines.length - 1; i++) {
-                        res.write(`data: ${lines[i]}\n\n`);
-                    }
-
-                    // Retain the last incomplete line in the buffer
-                    chunkBuffer = lines[lines.length - 1];
-                }
-            }
-        }
-
-        // Flush any remaining content in the buffer
-        if (chunkBuffer) {
-            res.write(`data: ${chunkBuffer}\n\n`);
-        }
-
-        console.log(fullResponse)
-        // Add the full response to the conversation history
-        await addObjectToArray(interviewId,{ role: "assistant", content: fullResponse , backendPrompt: false});
-
-        res.write("data: [DONE]\n\n"); // Signal that streaming is complete
-        res.end();
-    } catch (error) {
-        console.error("Error calling OpenAI API:", error);
-        res.status(500).json({ error: "Error communicating with ChatGPT" });
-    }
 }));
 
 router.post('/:userId/:interviewId/get-feedback', asyncHandler(async (req, res) => {

@@ -5,6 +5,7 @@ const port = process.env.PORT || 3000;
 
 const loginApi = require('./routes/loginApi');
 const interviewApi = require('./routes/interviewApi');
+const interviewSseApi = require('./routes/interviewSseApi');
 const userApi = require('./routes/userApi');
 
 const knex = require('knex');
@@ -38,6 +39,7 @@ const db = knex(knexConfig[environment]);
     // Define API routes
     app.use('/login', loginApi);
     app.use('/interview', interviewApi);
+    app.use('/interview', interviewSseApi);
     app.use('/users', userApi);
       app.use((err, req, res, next) => {
           console.error("Server Error:", err); // Log the error for debugging
