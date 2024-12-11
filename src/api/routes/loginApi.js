@@ -4,9 +4,11 @@ const jwt = require("jsonwebtoken");
 const router = express.Router();
 require('dotenv').config();
 
-
+const asyncHandler = (fn) => (req, res, next) => {
+    Promise.resolve(fn(req, res, next)).catch(next);
+};
 const SECRET_KEY = process.env.JWT_SECRET;
-router.post('/', async (req,res) => {
+router.post('/', asyncHandler(async (req,res) => {
     const { userName, password} = req.body;
     try {
         // Simulate fetching user from database
@@ -31,9 +33,9 @@ router.post('/', async (req,res) => {
     } catch (error) {
         res.status(500).json({ error: "Internal Server Error" });
     }
-})
+}));
 
-router.post('/signup', async (req, res) => {
+router.post('/signup', asyncHandler(async (req, res) => {
     const { userName, password } = req.body;
 
     try {
@@ -54,7 +56,7 @@ router.post('/signup', async (req, res) => {
         console.error('Error saving user:', error.message);
         res.status(500).json({ error: 'Internal Server Error' });
     }
-});
+}));
 
 
 module.exports = router;

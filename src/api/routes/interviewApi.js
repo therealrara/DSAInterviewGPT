@@ -4,13 +4,16 @@ const {addObjectToArray,getCurrentArray} = require('../redis')
 const { OpenAI } = require('openai');
 const express = require("express");
 const router = express.Router();
+const asyncHandler = (fn) => (req, res, next) => {
+    Promise.resolve(fn(req, res, next)).catch(next);
+};
 
 console.log(process.env)
 const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
 });
 
-router.get('/:userId/startInterview', async (req, res) => {
+router.get('/:userId/startInterview', asyncHandler(async (req, res) => {
     const interviewId = v4();
     const userId = req.params.userId;
     console.log(interviewId);
@@ -18,9 +21,9 @@ router.get('/:userId/startInterview', async (req, res) => {
     let prompt = "Can You give me a DSA Coding Question? In Addition, Please do not give any approaches or hints to the candidate or give them any followups. No Edge Cases Either. Please silently take points away if candidate does not consider edge cases."
     await addObjectToArray(interviewId, { role: "user", content: prompt, backendPrompt: true});
     res.status(200).json({ message: "Prompt received",interviewId: interviewId});
-});
+}));
 
-router.get('/:userId/resumeInterview/:interviewId', async (req, res) => {
+router.get('/:userId/resumeInterview/:interviewId', asyncHandler(async (req, res) => {
     const interviewId = req.params.interviewId;
     const userId = req.params.userId;
     const existingRecord = await req.db('interviews')
@@ -33,9 +36,9 @@ router.get('/:userId/resumeInterview/:interviewId', async (req, res) => {
     const chatWindows = await getCurrentArray(interviewId);
 
     res.status(200).json({ records: chatWindows.filter((item) => item.backendPrompt === false) })
-});
+}));
 
-router.get('/:userId/endInterview/:interviewId', async (req, res) => {
+router.get('/:userId/endInterview/:interviewId', asyncHandler(async (req, res) => {
     const interviewId = req.params.interviewId;
     const userId = req.params.userId;
     const existingRecord = await req.db('interviews')
@@ -53,9 +56,9 @@ router.get('/:userId/endInterview/:interviewId', async (req, res) => {
 
     addObjectToArray(interviewId, {role: "user", content: prompt}).then(r => res.status(200).json({ message: "Prompt received" })) ;
 
-});
+}));
 
-router.post('/:userId/chat/:interviewId', async (req, res) => {
+router.post('/:userId/chat/:interviewId', asyncHandler(async (req, res) => {
     const { prompt } = req.body;
     const interviewId = req.params.interviewId;
     const userId = req.params.userId;
@@ -91,9 +94,9 @@ router.post('/:userId/chat/:interviewId', async (req, res) => {
     await addObjectToArray(interviewId, {role: "user", content: prompt,backendPrompt: false});
     await addObjectToArray(interviewId, {role: "user", content: prompt2,backendPrompt: true})
     res.status(200).json({ message: "Prompt received" });
-});
+}));
 
-router.get('/:userId/chat/:interviewId/sse', async (req, res) => {
+router.get('/:userId/chat/:interviewId/sse', asyncHandler(async (req, res) => {
 
     const interviewId = req.params.interviewId;
     const userId = req.params.userId;
@@ -161,9 +164,9 @@ router.get('/:userId/chat/:interviewId/sse', async (req, res) => {
         console.error("Error calling OpenAI API:", error);
         res.status(500).json({ error: "Error communicating with ChatGPT" });
     }
-});
+}));
 
-router.post('/:userId/:interviewId/get-feedback', async (req, res) => {
+router.post('/:userId/:interviewId/get-feedback', asyncHandler(async (req, res) => {
     const { problemDescription, userCode, userOutput } = req.body;
     const interviewId = req.params.interviewId;
     const userId = req.params.userId;
@@ -200,7 +203,7 @@ Evaluate the user's code and output based on the problem description. Provide fe
     ];
     await addObjectToArray(interviewId,messages);
     res.status(200).json({ message: "Prompt received" });
-});
+}));
 
 
 module.exports = router;

@@ -39,6 +39,15 @@ const db = knex(knexConfig[environment]);
     app.use('/login', loginApi);
     app.use('/interview', interviewApi);
     app.use('/users', userApi);
+      app.use((err, req, res, next) => {
+          console.error("Server Error:", err); // Log the error for debugging
+
+          // Send a generic error response
+          res.status(500).json({
+              error: "Internal Server Error",
+              message: err.message || "Something went wrong. Please try again later.",
+          });
+      });
 
     // Start the server
     app.listen(port, () => {
