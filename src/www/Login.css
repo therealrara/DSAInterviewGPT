@@ -1,83 +1,120 @@
-/* Common container styles */
-.login-container {
-    padding: 20px;
-    max-width: 1200px;
-    margin: 0 auto;
+/* Universal Reset */
+*,
+*::before,
+*::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-/* Center content for the initial screen */
-.initial-screen {
+/* Body and Login Container */
+body, html {
+    height: 100%;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(to bottom, #e3f2fd, #ffffff); /* Subtle gradient */
     display: flex;
-    flex-direction: column;
     justify-content: center;
     align-items: center;
-    height: 100vh; /* Full height to center vertically */
+    padding: 10px; /* Prevent elements from touching screen edges */
+}
+
+/* Debugging Borders */
+.login-container {
+    width: 100%;
+    max-width: 400px; /* Constrain container width */
+    margin: 0 auto;
+    padding: 20px 15px; /* Inner padding */
+    background-color: #ffffff;
+    border: 1px solid #ddd; /* Ensure it doesn't blend into the background */
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     text-align: center;
+    overflow: hidden; /* Prevent content overflow */
 }
 
-.initial-screen h1 {
+/* Title Styling */
+.login-container h1 {
+    font-size: 24px;
+    color: #333;
     margin-bottom: 20px;
+    padding: 0 10px; /* Prevent title from touching the edges */
+    max-width: 100%; /* Allow title to respect container boundaries */
+    word-wrap: break-word; /* Wrap long words */
+    overflow-wrap: break-word; /* Additional support for word wrapping */
+    text-align: center;
+    line-height: 1.5;
 }
 
-.initial-screen button {
-    padding: 10px 20px;
+/* Input Fields */
+.input-field {
+    width: 100%; /* Full width for uniformity */
+    padding: 10px 14px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-bottom: 15px; /* Space between inputs */
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.input-field:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+    outline: none;
+}
+
+/* Button Styles */
+.primary-button,
+.secondary-button {
+    width: 100%;
+    padding: 12px 16px;
     font-size: 16px;
     border: none;
-    background: #007bff;
-    color: #fff;
     border-radius: 5px;
     cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    margin-top: 10px; /* Space above buttons */
 }
 
-.initial-screen button:disabled {
-    background: #999;
-    cursor: not-allowed;
+.primary-button {
+    background-color: #007bff;
+    color: white;
 }
 
-/* Layout for the interview session */
-.interview-session {
-    display: flex;
-    gap: 20px;
+.primary-button:hover {
+    background-color: #0056b3;
+    transform: translateY(-2px); /* Subtle hover effect */
 }
 
-.chat-section,
-.code-editor-section {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    background: #f9f9f9;
-    padding: 15px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-}
-
-.chat-window {
-    height: 400px;
-    overflow-y: auto;
+.secondary-button {
+    background-color: #f8f9fa;
+    color: #333;
     border: 1px solid #ccc;
-    padding: 10px;
-    background: #fff;
-    border-radius: 4px;
 }
 
-textarea {
-    resize: none;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    padding: 10px;
-    font-size: 14px;
+.secondary-button:hover {
+    background-color: #e2e6ea;
+    transform: translateY(-2px); /* Subtle hover effect */
 }
 
-button {
-    padding: 10px;
-    border: none;
-    background: #007bff;
-    color: #fff;
-    border-radius: 4px;
-    cursor: pointer;
-}
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .login-container {
+        padding: 15px;
+        border-radius: 8px;
+    }
 
-button:hover {
-    background: #0056b3;
+    .login-container h1 {
+        font-size: 20px; /* Scale down font size for smaller screens */
+    }
+
+    .input-field {
+        padding: 8px 12px;
+        font-size: 14px;
+    }
+
+    .primary-button,
+    .secondary-button {
+        padding: 10px 14px;
+        font-size: 14px;
+    }
 }

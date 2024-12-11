@@ -176,13 +176,20 @@ const ChatComponent = ({setIsLoggedIn}) => {
 
     return (
         <div className="chat-container">
-            <button onClick={() => setIsLoggedIn(false)}>Logout</button>
-            <button onClick={() => navigate("/")}>Main Menu</button>
+            <header className="chat-header">
+                <button onClick={() => navigate("/")}>Main Menu</button>
+                <button onClick={() => setIsLoggedIn(false)}>Logout</button>
+            </header>
             {isInterviewStarted && (
                 <div className="interview-session">
                     <div className="chat-section">
                         <h2>Chat</h2>
                         <div className="chat-window">
+                            {isChatLoading && (
+                                <div className="loading-message">
+                                    <Spinner /> Loading...
+                                </div>
+                            )}
                             {conversation.map((entry, index) => (
                                 <div
                                     key={index}
@@ -191,12 +198,8 @@ const ChatComponent = ({setIsLoggedIn}) => {
                                     <MarkdownRenderer markdownContent={entry.content} />
                                 </div>
                             ))}
-                            {isChatLoading && (
-                                <div className="loading-message">
-                                    <Spinner /> {}
-                                </div>
-                            )}
                         </div>
+
                         <textarea
                             value={message}
                             onChange={(e) => setMessage(e.target.value)}

@@ -1,31 +1,84 @@
 .scorecard-container {
     padding: 20px;
-    border: 1px solid #ccc;
-    border-radius: 10px;
-    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    background-color: #ffffff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     text-align: center;
+    font-family: Arial, sans-serif;
+    max-width: 600px;
+    margin: 0 auto;
 }
 
-.scorecard-summary {
-    margin-top: 10px;
-    max-height: 300px;
-    overflow-y: auto;
+.scorecard-container h2 {
+    color: #333333;
+    font-size: 1.5em;
+    margin-bottom: 10px;
+}
+
+.scorecard-container h3 {
+    color: #555555;
+    font-size: 1.2em;
+    margin-top: 20px;
+    margin-bottom: 10px;
     text-align: left;
 }
 
+.scorecard-container p {
+    color: #666666;
+    font-size: 1em;
+    margin: 10px 0;
+}
+
+.scorecard-summary,
 .scorecard-feedback {
-    margin-top: 10px;
+    margin-top: 15px;
     max-height: 300px;
     overflow-y: auto;
     text-align: left;
+    background-color: #f9f9f9;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    padding: 10px;
 }
 
-.summary-user {
+.chat-user {
     color: #2c3e50;
     margin: 5px 0;
+    padding: 5px;
+    background-color: #eaf2f8;
+    border-radius: 6px;
 }
 
-.summary-assistant {
+.chat-assistant {
     color: #8e44ad;
     margin: 5px 0;
+    padding: 5px;
+    background-color: #f5eef8;
+    border-radius: 6px;
+}
+
+button {
+    padding: 10px 20px;
+    margin: 10px;
+    border: none;
+    border-radius: 8px;
+    background-color: #3498db;
+    color: white;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #2980b9;
+}
+
+button:focus {
+    outline: none;
+    box-shadow: 0 0 5px #3498db;
+}
+
+button:active {
+    background-color: #1c6e9c;
 }

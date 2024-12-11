@@ -4,7 +4,9 @@ import { ToastContainer, toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import ChatComponent from "./App";
 import LandingPage from "./LandingPage";
+import './Login.css';
 require('dotenv').config();
+
 
 const API_URL = process.env.REACT_APP_API_URL
 
@@ -202,86 +204,66 @@ const Login  = ({ setIsLoggedIn , setUserId}) => {
     }
     return (
         <div className="login-container">
-            <h1>Welcome to the Data Structures and Algorithms Mock Interview Bot</h1>
             {isLogin ? (
                 <div className="initial-screen">
+                    <h1>Welcome to the Data Structures and Algorithms Mock Interview Bot</h1>
                     <h1>Log in</h1>
-                    <textarea
+                    <input
                         value={userName}
                         onChange={(e) => setUserName(e.target.value)}
                         placeholder="Username"
-                        rows="4"
-                        cols="50"
+                        type="text"
+                        className="input-field"
                     />
                     <input
                         type="password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         placeholder="Password"
-                        onPaste={(e) => e.preventDefault()} // Prevent pasting for security
-                        onCopy={(e) => e.preventDefault()} // Prevent copying for security
-                        style={{
-                            width: "100%",
-                            padding: "10px",
-                            fontSize: "16px",
-                            borderRadius: "5px",
-                            border: "1px solid #ccc",
-                            marginBottom: "10px",
-                        }}
+                        onPaste={(e) => e.preventDefault()}
+                        onCopy={(e) => e.preventDefault()}
+                        className="input-field"
                     />
-                    <button onClick={logUserIn}>
+                    <button onClick={logUserIn} className="primary-button">
                         Login
                     </button>
-                    <button onClick={() => setUpSignUpForm()}>
+                    <button onClick={setUpSignUpForm} className="secondary-button">
                         Sign up
                     </button>
                 </div>
-                ) : (
+            ) : (
                 <div className="initial-screen">
-                    <h1>Log in</h1>
-                    <textarea
+                    <h1>Welcome to the Data Structures and Algorithms Mock Interview Bot</h1>
+                    <h1>Sign up</h1>
+                    <input
                         value={userName}
                         onChange={(e) => setUserName(e.target.value)}
                         placeholder="Username"
-                        rows="4"
-                        cols="50"
+                        type="text"
+                        className="input-field"
                     />
                     <input
                         type="password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         placeholder="Password"
-                        onPaste={(e) => e.preventDefault()} // Prevent pasting for security
-                        onCopy={(e) => e.preventDefault()} // Prevent copying for security
-                        style={{
-                            width: "100%",
-                            padding: "10px",
-                            fontSize: "16px",
-                            borderRadius: "5px",
-                            border: "1px solid #ccc",
-                            marginBottom: "10px",
-                        }}
+                        onPaste={(e) => e.preventDefault()}
+                        onCopy={(e) => e.preventDefault()}
+                        className="input-field"
                     />
                     <input
                         type="password"
                         value={repeatPassword}
                         onChange={(e) => setRepeatPassword(e.target.value)}
-                        placeholder="Password"
-                        onPaste={(e) => e.preventDefault()} // Prevent pasting for security
-                        onCopy={(e) => e.preventDefault()} // Prevent copying for security
-                        style={{
-                            width: "100%",
-                            padding: "10px",
-                            fontSize: "16px",
-                            borderRadius: "5px",
-                            border: "1px solid #ccc",
-                            marginBottom: "10px",
-                        }}
+                        placeholder="Repeat Password"
+                        onPaste={(e) => e.preventDefault()}
+                        onCopy={(e) => e.preventDefault()}
+                        className="input-field"
                     />
-                    <button onClick={signUserUp}>
+                    <button onClick={signUserUp} className="primary-button">
                         Sign Up
                     </button>
-                    <button onClick={setUpSignUpForm}>
+                    <button onClick={setUpSignUpForm} className="secondary-button">
                         Return to Login
                     </button>
                 </div>

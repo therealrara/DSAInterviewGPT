@@ -167,7 +167,7 @@ return (
                     <button onClick={downloadFeedback}>Download Transcript Here</button>
                 </div>
             )}
-            <button onClick={onRestart}>Restart Interview</button>
+            <button onClick={onRestart}>Start New Interview</button>
             <button onClick={() => navigate("/")}>Main Menu</button>
         </div>
     );
