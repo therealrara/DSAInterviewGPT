@@ -16,7 +16,7 @@ console.log(API_URL);
 
 const ChatComponent = ({setIsLoggedIn}) => {
     const location = useLocation();
-    const isNewInterview = location.state?.isNewInterview || false; // Default to false if not provided
+    let isNewInterview = location.state?.isNewInterview || false; // Default to false if not provided
     const [conversation, setConversation] = useState([]);
     const { interviewId } = useParams();
     const [message, setMessage] = useState("");
@@ -135,13 +135,36 @@ const ChatComponent = ({setIsLoggedIn}) => {
         } else {
             handleResumeInterview().then(r => console.log(""));
         }
-    },[isNewInterview])
+    },[isNewInterview,interviewId])
 
-    const handleRestartInterview = () => {
-        setConversation([]);
-        setMessage("");
-        setIsInterviewStarted(true);
-        setIsInterviewFinished(false);
+    const handleRestartInterview = async () => {
+        try {
+            setConversation([]);
+            setMessage("");
+            setIsInterviewStarted(true);
+            setIsInterviewFinished(false);
+
+            console.log(API_URL);
+            const response = await fetch(`${API_URL}/interview/${userId}/startInterview`, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' },
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to initiate SSE connection.');
+            }
+
+            const body = await response.json();
+            console.log('API Response:', body);
+
+            if (!body.interviewId) {
+                throw new Error('Invalid response: interviewId not found.');
+            }
+            isNewInterview = true;
+            navigate(`/interview/${body.interviewId}`, { state: { isNewInterview: true } });
+        } catch (error) {
+            console.error('Error restarting interview:', error.message);
+        }
     };
 
     return (

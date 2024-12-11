@@ -104,13 +104,13 @@ router.get('/:userId/chat/:interviewId/sse', asyncHandler(async (req, res) => {
 function parseFeedback(input) {
     const scoreRegex = /^\*\*Score:\s*(.*?)\*\*/; // Match the "Score" field
     const scoreMatch = input.match(scoreRegex); // Extract the score
-
-    if (!scoreMatch) {
-        throw new Error("Invalid input format: 'Score' not found.");
+    let score = "Rating Not Determinable"; // Extract the score value
+    let interview_feedback = input // Remove the score part and trim the rest
+    if (scoreMatch) {
+        score = scoreMatch[1]; // Extract the score value
+        interview_feedback = input.replace(scoreMatch[0], "").trim();;
     }
 
-    const score = scoreMatch[1]; // Extract the score value
-    const interview_feedback = input.replace(scoreMatch[0], "").trim(); // Remove the score part and trim the rest
 
     return {
         score,
@@ -121,13 +121,14 @@ function parseFeedback(input) {
 function parseProblem(input) {
     const titleRegex = /^\*\*(.*?)\*\*/; // Match the title between the first pair of ** **
     const titleMatch = input.match(titleRegex); // Extract the title
-
-    if (!titleMatch) {
-        throw new Error("Invalid input format: 'Title' not found.");
+    let title = "Title Not Found"
+    let problem_statement = input;
+    if (titleMatch) {
+        title = titleMatch[1];
+        problem_statement = input.replace(titleMatch[0], "").trim(); // Remove the title and keep the markdown format
     }
 
-    const title = titleMatch[1]; // Extract the title text
-    const problem_statement = input.replace(titleMatch[0], "").trim(); // Remove the title and keep the markdown format
+     // Extract the title text
 
     return {
         title,
