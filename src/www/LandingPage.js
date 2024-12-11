@@ -9,8 +9,8 @@ const LandingPage = ({ setIsLoggedIn }) => {
     const [loading, setLoading] = useState(true);
     const userId = localStorage.getItem("userId");
     const navigate = useNavigate();
-    const handleCardClick = (interviewId) => {
-        navigate(`/interview/${interviewId}`,{ state: { isNewInterview: false } });
+    const handleCardClick = (interviewId,in_progress) => {
+        navigate(`/interview/${interviewId}`,{ state: { isNewInterview: false , in_progress: in_progress} });
     }
 
     const handleStartInterview = async () => {
@@ -25,7 +25,7 @@ const LandingPage = ({ setIsLoggedIn }) => {
         }
         const body = await response.json()
         console.log(body);
-        navigate(`/interview/${body.interviewId}`,{ state: { isNewInterview: true } });
+        navigate(`/interview/${body.interviewId}`,{ state: { isNewInterview: true , in_progress: true} });
     }
 
     useEffect(() => {
@@ -74,7 +74,7 @@ const LandingPage = ({ setIsLoggedIn }) => {
                 {interviews.map((interview) => (
                     <div
                         key={interview.id}
-                        onClick={() => handleCardClick(interview.interview_id)}
+                        onClick={() => handleCardClick(interview.interview_id,interview.in_progress)}
                         style={{
                             background: "#fff",
                             border: "1px solid #ddd",

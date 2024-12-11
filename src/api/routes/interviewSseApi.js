@@ -3,6 +3,7 @@ require('dotenv').config();
 const {v4} = require("uuid");
 const { OpenAI } = require('openai');
 const express = require("express");
+const {s3Upload, generatePresignedUrl} = require("../s3Storage");
 const router = express.Router();
 const asyncHandler = (fn) => (req, res, next) => {
     Promise.resolve(fn(req, res, next)).catch(next);
@@ -90,6 +91,12 @@ router.get('/:userId/chat/:interviewId/sse', asyncHandler(async (req, res) => {
                     await req.db('interviews')
                         .where({ user_id: userId, interview_id: interviewId })
                         .update({ in_progress: false, ...fields });
+                    console.log("MAKES IT")
+                    const arr = await getCurrentArray(interviewId);
+                    const url = await s3Upload(arr.filter((item) => item.backendPrompt === false),interviewId);
+                    await req.db('interviews')
+                        .where({ user_id: userId, interview_id: interviewId })
+                        .update({ conversation_link: url});
                 }
             } catch (error) {
                 console.error("Error writing to database:", error);

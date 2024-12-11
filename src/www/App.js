@@ -17,6 +17,7 @@ console.log(API_URL);
 const ChatComponent = ({setIsLoggedIn}) => {
     const location = useLocation();
     let isNewInterview = location.state?.isNewInterview || false; // Default to false if not provided
+    let inProgress = location.state?.in_progress || false; // Default to false if not provided
     const [conversation, setConversation] = useState([]);
     const { interviewId } = useParams();
     const [message, setMessage] = useState("");
@@ -77,9 +78,15 @@ const ChatComponent = ({setIsLoggedIn}) => {
             throw new Error('Failed to initiate SSE connection.');
         }
         const body = await response.json()
-        setConversation(([]) => {
-            return body.records;
-        })
+        if (!inProgress) {
+            setIsInterviewStarted(false);
+            setLoading(false);
+            setIsInterviewFinished(true);
+        } else {
+            setConversation(([]) => {
+                return body.records;
+            })
+        }
     }
 
     const handleSendMessage = async () => {
@@ -214,7 +221,7 @@ const ChatComponent = ({setIsLoggedIn}) => {
             )}
 
             {isInterviewFinished && (
-                <Scorecard interviewId={interviewId} conversation={conversation} onRestart={handleRestartInterview} />
+                <Scorecard interviewId={interviewId} conversation={conversation} onRestart={handleRestartInterview} inProgress={inProgress}/>
             )}
         </div>
     );

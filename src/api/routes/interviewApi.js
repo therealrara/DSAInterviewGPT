@@ -1,8 +1,8 @@
 require('dotenv').config();
 const {v4} = require("uuid");
 const {addObjectToArray,getCurrentArray} = require('../redis')
-const { OpenAI } = require('openai');
 const express = require("express");
+const {generatePresignedUrl} = require("../s3Storage");
 const router = express.Router();
 const asyncHandler = (fn) => (req, res, next) => {
     Promise.resolve(fn(req, res, next)).catch(next);
@@ -54,6 +54,42 @@ router.get('/:userId/endInterview/:interviewId', asyncHandler(async (req, res) =
     res.status(200).json({ message: "Prompt received" });
 
 }));
+
+router.get('/:userId/fetchInterview/:interviewId', asyncHandler(async (req, res) => {
+    const interviewId = req.params.interviewId;
+    const userId = req.params.userId;
+
+    const existingRecord = await req.db('interviews')
+        .where({ user_id: userId,interview_id: interviewId}).first()
+    res.status(200).json({ records: existingRecord })
+}));
+
+router.get('/:userId/download/:interviewId', async (req, res) => {
+    try {
+        const interviewId = req.params.interviewId;
+        const userId = req.params.userId;
+        const existingRecord = await req.db('interviews')
+            .where({ user_id: userId, interview_id: interviewId })
+            .first();
+
+        if (!existingRecord) {
+            return res.status(401).json({ error: 'Unauthorized: Invalid user or interview ID' });
+        }
+        const fileName = req.params.interviewId;
+
+        if (!fileName) {
+            return res.status(400).json({ error: 'File name is required.' });
+        }
+
+        // Generate pre-signed URL
+        const downloadUrl = await generatePresignedUrl(fileName, 3600); // URL valid for 1 hour
+        res.status(200).json({ url: downloadUrl });
+    } catch (error) {
+        console.error('Error generating download link:', error.message);
+        res.status(500).json({ error: 'Failed to generate download link.' });
+    }
+});
+
 
 router.post('/:userId/chat/:interviewId', asyncHandler(async (req, res) => {
     const { prompt } = req.body;
