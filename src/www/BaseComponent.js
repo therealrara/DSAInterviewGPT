@@ -21,14 +21,16 @@ const App = () => {
     const handleLogin = (id) => {
         setIsLoggedIn(true);
         setUserId(id);
-        localStorage.setItem("userId", id); // Persist userId in localStorage
+        localStorage.setItem("userId", id);
     };
 
     // Clear user session on logout
     const handleLogout = () => {
         setIsLoggedIn(false);
         setUserId("");
-        localStorage.removeItem("userId"); // Clear localStorage
+        localStorage.removeItem("userId");
+        localStorage.removeItem("token");
+        localStorage.removeItem("userName");// Clear localStorage
     };
 
     return (

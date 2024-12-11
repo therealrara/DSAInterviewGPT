@@ -15,8 +15,8 @@ router.get('/:userId/startInterview', asyncHandler(async (req, res) => {
     const userId = req.params.userId;
     console.log(interviewId);
     await req.db('interviews').insert({interview_id: interviewId, in_progress: true, user_id: userId});
-    let prompt = "Can You give me a DSA Coding Question? In Addition, Please do not give any approaches or hints to the candidate or give them any followups. No Edge Cases Either. Please silently take points away if candidate does not consider edge cases."
-    await addObjectToArray(interviewId, { role: "user", content: prompt, backendPrompt: true, startPrompt: true});
+    let prompt = "Can You give me a DSA Coding Question? In Addition, Please do not give any approaches or hints to the candidate or give them any followups. No Edge Cases Either. Please silently take points away if candidate does not consider edge cases. The format response should be a bolded title of the question, followed by a warm greeting to the candidate thanking them for the time, then the detailed DSA Leetcode question as if you're the interviewer, then the clarity of instructions to make sure they explain their thought process before coding?"
+    await addObjectToArray(interviewId, { role: "user", content: prompt, backendPrompt: true, startPrompt: true, endPrompt: false});
     res.status(200).json({ message: "Prompt received",interviewId: interviewId});
 }));
 
@@ -45,13 +45,13 @@ router.get('/:userId/endInterview/:interviewId', asyncHandler(async (req, res) =
     if (!existingRecord) {
         return res.status(401).json({ error: 'Unauthorized: Invalid user or interview ID' });
     }
-    let prompt = "Given all the info I have shared, can you please grade this DSA interview as if you were interviewing for Meta amongst a scale of strong no hire, no hire,leans in both directions,hire, strong hire? The goal here should be to assess accurate interview performance according to faang. So I would expect a thorough explanation of the code you wrote, a thorough explanation of the edge cases, a thorough explanation of the problem, and the overall fixes to the code. If there are multiple attempts at the code, definitely use the best one to evaluate the quality of the code. If no chat history, you should default to strong no hire. If there is chat history, but no problem, still no hire. Do not give generic advice. if there's not much to work with, please say so. "
-    await addObjectToArray(interviewId,{ role: "user", content: prompt , backendPrompt: false, startPrompt: false});
+    let prompt = "Given all the info I have shared, can you please grade this DSA interview as if you were interviewing for Meta amongst a scale of strong no hire, no hire,leans in both directions,hire, strong hire? The goal here should be to assess accurate interview performance according to faang. So I would expect a thorough explanation of the code you wrote, a thorough explanation of the edge cases, a thorough explanation of the problem, and the overall fixes to the code. If there are multiple attempts at the code, definitely use the best one to evaluate the quality of the code. If no chat history, you should default to strong no hire. If there is chat history, but no problem, still no hire. Do not give generic advice. if there's not much to work with, please say so. The format should always be beginning with at all times: Score: {Rating} in bold, and then it must be the detailed feeedback. If the response always has a leading text, that is never correct. please make sure it is in form score: {Score} then detailed feedback. "
+    await addObjectToArray(interviewId,{ role: "user", content: prompt , backendPrompt: true, startPrompt: false, endPrompt: true});
     if (!prompt) {
         return res.status(400).json({ error: "Prompt is required" });
     }
 
-    addObjectToArray(interviewId, {role: "user", content: prompt}).then(r => res.status(200).json({ message: "Prompt received" })) ;
+    res.status(200).json({ message: "Prompt received" });
 
 }));
 
@@ -88,8 +88,8 @@ router.post('/:userId/chat/:interviewId', asyncHandler(async (req, res) => {
     if (!prompt) {
         return res.status(400).json({ error: "Prompt is required" });
     }
-    await addObjectToArray(interviewId, {role: "user", content: prompt,backendPrompt: false, startPrompt: false});
-    await addObjectToArray(interviewId, {role: "user", content: prompt2,backendPrompt: true, startPrompt: false})
+    await addObjectToArray(interviewId, {role: "user", content: prompt,backendPrompt: false, startPrompt: false, endPrompt: false});
+    await addObjectToArray(interviewId, {role: "user", content: prompt2,backendPrompt: true, startPrompt: false, endPrompt: false})
     res.status(200).json({ message: "Prompt received" });
 }));
 

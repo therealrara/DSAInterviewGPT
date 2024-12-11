@@ -101,6 +101,7 @@ const Login  = ({ setIsLoggedIn , setUserId}) => {
                 // Save token or handle session
                 localStorage.setItem("authToken", data.token);
                 localStorage.setItem("userId", data.userId);
+                localStorage.setItem("userName", data.userName);
                 setIsLoggedIn(data.userId);
             } catch (error) {
                 console.error("Error logging in:", error);
@@ -164,7 +165,10 @@ const Login  = ({ setIsLoggedIn , setUserId}) => {
                     draggable: true,
                     progress: undefined,
                 });
-                setIsLogin(!isLogin); // Navigate to login page
+                setUserName("")
+                setPassword("")
+                setRepeatPassword("")
+                setIsLogin(!isLogin)
             } catch (error) {
                 console.error("Error signing up:", error);
                 toast.error("Something went wrong. Please try again later!", {

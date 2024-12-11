@@ -63,7 +63,8 @@ const LandingPage = ({ setIsLoggedIn }) => {
     return (
         <div className="container">
             <button onClick={() => setIsLoggedIn(false)}>Logout</button>
-            <h1>Your DSA Mock Interviews</h1>
+            <h1>Welcome {localStorage.getItem("userName")}</h1>
+            <h2>Your DSA Mock Interviews</h2>
             <div style={{
                 display: "grid",
                 gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
@@ -94,16 +95,16 @@ const LandingPage = ({ setIsLoggedIn }) => {
                         }}
                     >
                         <h3 style={{ margin: "0 0 12px", fontSize: "1.25rem", color: "#333" }}>
-                            Interview ID: {interview.interview_id}
+                            Interview Question: {interview.title !== null ? interview.title : "No Title"}
                         </h3>
                         <p style={{ margin: "8px 0", fontSize: "0.9rem", color: "#666" }}>
-                            <strong>In Progress:</strong> {interview.in_progress ? "Yes" : "No"}
+                            <strong>Score:</strong> {interview.score !== null ? interview.score : "No Score Yet"}
+                        </p>
+                        <p style={{ margin: "8px 0", fontSize: "0.9rem", color: "#666" }}>
+                            <strong>State:</strong> {interview.in_progress ? "In Progress" : "Finished"}
                         </p>
                         <p style={{ margin: "8px 0", fontSize: "0.9rem", color: "#666" }}>
                             <strong>Created At:</strong> {new Date(interview.created_at).toLocaleString()}
-                        </p>
-                        <p style={{ margin: "8px 0", fontSize: "0.9rem", color: "#666" }}>
-                            <strong>Updated At:</strong> {new Date(interview.updated_at).toLocaleString()}
                         </p>
                     </div>
                 ))}
