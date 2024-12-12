@@ -220,7 +220,7 @@ const Login  = ({ setIsLoggedIn , setUserId}) => {
                 });
             }
         } else {
-            toast.error("UserName is Too short", {
+            toast.error("UserName is Too short. 7 characters or more.", {
                 position: "top-right",
                 autoClose: 3000,
                 hideProgressBar: false,
