@@ -1,15 +1,16 @@
-import React, { useState, useEffect } from "react";
+import React, {useState, useEffect} from "react";
 import CodeMirror from "@uiw/react-codemirror";
-import { javascript } from "@codemirror/lang-javascript";
-import { python } from "@codemirror/lang-python";
+import {javascript} from "@codemirror/lang-javascript";
+import {python} from "@codemirror/lang-python";
 
 const API_URL = process.env.REACT_APP_API_URL
 
-const CodingEditor = ({ code, setCode }) => {
+const CodingEditor = ({code, setCode, setConversation, interviewId, setIsChatLoading}) => {
     const [output, setOutput] = useState('');
     const [showOutput, setShowOutput] = useState(false);
     const [language, setLanguage] = useState("javascript");
     const [pyodide, setPyodide] = useState(null);
+    const userId = localStorage.getItem("userId");
 
     // Load Pyodide when the component mounts
     useEffect(() => {
@@ -121,51 +122,53 @@ const CodingEditor = ({ code, setCode }) => {
         // Output is also in state
         const userOutput = output;
 
-        return { userCode, problemDescription, userOutput };
+        return {userCode, problemDescription, userOutput};
     };
 
     const assessSolution = async () => {
-        const { userCode, problemDescription, userOutput } = getCodeAndOutput();
-      
-        try {
-          const response = await fetch(API_URL + '/api/get-feedback', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              problemDescription,
-              userCode,
-              userOutput,
-            }),
-          });
-      
-          if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-          }
-      
-          const data = await response.json();
-          const feedback = data.feedback.content;          
-      
-          // Display feedback
-          displayFeedback(feedback);
-        } catch (error) {
-          console.error('Error calling feedback API:', error);
-          displayFeedback('Error: Could not retrieve feedback at this time.');
-        }
-      };
-      
+        const {userCode, problemDescription, userOutput} = getCodeAndOutput();
 
-    // Display feedback in a feedback container
-    const displayFeedback = (feedback) => {
-        const feedbackContainer = document.querySelector('.feedback-container');
-        if (feedbackContainer) {
-            feedbackContainer.innerText = feedback;
-        } else {
-            const newFeedbackContainer = document.createElement('div');
-            newFeedbackContainer.classList.add('feedback-container');
-            newFeedbackContainer.innerText = feedback;
-            document.body.appendChild(newFeedbackContainer); // Append to body or appropriate container
+        try {
+            setConversation((prev) => [
+                ...prev,
+                { role: "user", content: `\`\`\`\n${userCode}\n\`\`\`` }
+            ]);
+            setIsChatLoading(true);
+
+            const path = `/interview/${userId}/codeSubmission/${interviewId}`
+            const response = await fetch(API_URL + path, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({prompt: `\`\`\`\n${userCode}\n\`\`\``}),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to initiate SSE connection.');
+            }
+            const eventSource = new EventSource(API_URL + `/interview/${userId}/chat/${interviewId}/sse`);
+            let assistantResponse = "";
+
+            eventSource.onmessage = (event) => {
+                if (event.data === "[DONE]") {
+                    setIsChatLoading(false);
+                    eventSource.close();
+
+                    setConversation((prev) => [
+                        ...prev,
+                        { role: "assistant", content: assistantResponse },
+                    ]);
+                } else {
+                    assistantResponse += event.data + "\n";
+                }
+            };
+
+            eventSource.onerror = (error) => {
+                console.error("Error with SSE (chat):", error);
+                setIsChatLoading(false);
+                eventSource.close();
+            };
+        } catch (error) {
+            console.error('Error calling feedback API:', error);
         }
     };
 
@@ -175,7 +178,7 @@ const CodingEditor = ({ code, setCode }) => {
 
     return (
         <div>
-            { }
+            {}
             <select
                 value={language}
                 onChange={handleLanguageChange}
@@ -220,14 +223,14 @@ const CodingEditor = ({ code, setCode }) => {
                     }}
                 />
             </div>
-            <button onClick={handleRunCode} style={{ marginTop: '10px' }}>
+            <button onClick={handleRunCode} style={{marginTop: '10px'}}>
                 Run Code
             </button>
-            {showOutput && (<div className="output-container" style={{ marginTop: '20px' }}>
+            {showOutput && (<div className="output-container" style={{marginTop: '20px'}}>
                 <h3>Output:</h3>
                 <pre>{output}</pre>
             </div>)}
-            <button onClick={assessSolution} style={{ marginTop: '10px' }}>
+            <button onClick={assessSolution} style={{marginTop: '10px'}}>
                 Get Feedback
             </button>
         </div>

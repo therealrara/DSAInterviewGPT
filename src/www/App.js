@@ -78,6 +78,7 @@ const ChatComponent = ({setIsLoggedIn}) => {
             throw new Error('Failed to initiate SSE connection.');
         }
         const body = await response.json()
+        console.log(inProgress)
         if (!inProgress) {
             setIsInterviewStarted(false);
             setLoading(false);
@@ -218,7 +219,7 @@ const ChatComponent = ({setIsLoggedIn}) => {
 
                     <div className="code-editor-section">
                         <h2>Code Editor</h2>
-                        <CodingEditor code={code} setCode={setCode} />
+                        <CodingEditor code={code} setCode={setCode} setConversation={setConversation} setIsChatLoading={setIsChatLoading} interviewId={interviewId}/>
                     </div>
                 </div>
             )}

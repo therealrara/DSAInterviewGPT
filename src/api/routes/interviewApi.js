@@ -129,6 +129,35 @@ router.post('/:userId/chat/:interviewId', asyncHandler(async (req, res) => {
     res.status(200).json({ message: "Prompt received" });
 }));
 
+router.post('/:userId/codeSubmission/:interviewId', asyncHandler(async (req, res) => {
+    const { prompt } = req.body;
+    const interviewId = req.params.interviewId;
+    const userId = req.params.userId;
+    const existingRecord = await req.db('interviews')
+        .where({ user_id: userId, interview_id: interviewId })
+        .first();
+
+    if (!existingRecord) {
+        return res.status(401).json({ error: 'Unauthorized: Invalid user or interview ID' });
+    }
+
+    const prompt2 = "The Candidate has given you the code snippet to the problem above. Now that you have received it, you should act like an interviewer if they did not even attempt to solve the problem with you before writing the code. DOCK POINTS SEVERELY. " +
+        "THIS IS NOT ALLOWED. . You should NOT point out bugs, or if there are, you have to tell them that bugs " +
+        "exist and it is on them to figure them out. You should then ask questions like hey " +
+        "can we make the code faster? And then the candidate can go ahead and do anymore help. " +
+        "However, PLEASE DO NOT GIVE THE ANSWER OR ANY SUGGESTIONS FOR CODE CLEANLINESS, " +
+        "OPTIMIZATIONS NOTHING. YOU GIVING THE ANSWER IN RESPONSE TO THIS CHAT HISTORY " +
+        "IS SELF DEFEATING. PLEASE KEEP RESPONSES." +
+        " AND ALWAYS TREAT THE RESPONSE ABOVE THIS ONE AS THE PROMPT YOU ARE RESPONDING TO. "
+
+    if (!prompt) {
+        return res.status(400).json({ error: "Prompt is required" });
+    }
+    await addObjectToArray(interviewId, {role: "user", content: prompt,backendPrompt: false, startPrompt: false, endPrompt: false});
+    await addObjectToArray(interviewId, {role: "user", content: prompt2,backendPrompt: true, startPrompt: false, endPrompt: false})
+    res.status(200).json({ message: "Prompt received" });
+}));
+
 router.post('/:userId/:interviewId/get-feedback', asyncHandler(async (req, res) => {
     const { problemDescription, userCode, userOutput } = req.body;
     const interviewId = req.params.interviewId;

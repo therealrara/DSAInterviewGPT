@@ -68,8 +68,10 @@ const LandingPage = ({ setIsLoggedIn }) => {
                     Logout
                 </button>
             </header>
-            <h1>Welcome {localStorage.getItem("userName")}</h1>
-            <h2>Your DSA Mock Interviews</h2>
+            <div className="fixed-title">
+                <h1>Welcome {localStorage.getItem("userName")}</h1>
+                <h2>Your DSA Mock Interviews</h2>
+            </div>
             <div className="card-grid">
                 {interviews.map((interview) => (
                     <div
