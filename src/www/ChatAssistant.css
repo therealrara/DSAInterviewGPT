@@ -23,6 +23,7 @@
   position: sticky; /* Stay at the top of the container */
   top: 0;
   z-index: 10; /* Ensure it appears above other content */
+  margin-bottom: 20px; /* Add space below the header */
 }
 
 /* Header buttons */
@@ -70,10 +71,12 @@
   cursor: not-allowed;
 }
 
+
 /* Layout for the interview session */
 .interview-session {
   display: flex;
   gap: 20px;
+  margin-top: 20px; /* Ensure space below the header */
 }
 
 .chat-section,
@@ -83,9 +86,16 @@
   flex-direction: column;
   gap: 10px;
   background: #f9f9f9;
-  padding: 15px;
+  padding: 20px; /* Ensure enough padding around the content */
   border: 1px solid #ddd;
   border-radius: 8px;
+}
+.chat-section h2,
+.code-editor-section h2 {
+  margin-top: 0; /* Prevent excessive top margin */
+  margin-bottom: 10px; /* Add spacing below the header */
+  font-size: 18px; /* Adjust font size for visibility */
+  color: #333;
 }
 
 .chat-window {
