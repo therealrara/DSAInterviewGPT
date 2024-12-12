@@ -14,7 +14,7 @@ module.exports = {
         migrations: {
             directory: './migrations',
         },
-        debug: true,
+        debug: false,
     },
     production: {
         client: 'pg',

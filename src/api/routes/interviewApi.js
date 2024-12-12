@@ -8,12 +8,9 @@ const asyncHandler = (fn) => (req, res, next) => {
     Promise.resolve(fn(req, res, next)).catch(next);
 };
 
-console.log(process.env)
-
 router.get('/:userId/startInterview', asyncHandler(async (req, res) => {
     const interviewId = v4();
     const userId = req.params.userId;
-    console.log(interviewId);
     await req.db('interviews').insert({interview_id: interviewId, in_progress: true, user_id: userId});
     let prompt = "Can You give me a DSA Coding Question? In Addition, Please do not give any approaches or hints to the candidate or give them any followups. No Edge Cases Either. Please silently take points away if candidate does not consider edge cases. The format response should be a bolded title of the question, followed by a warm greeting to the candidate thanking them for the time, then the detailed DSA Leetcode question as if you're the interviewer, then the clarity of instructions to make sure they explain their thought process before coding?"
     await addObjectToArray(interviewId, { role: "user", content: prompt, backendPrompt: true, startPrompt: true, endPrompt: false});

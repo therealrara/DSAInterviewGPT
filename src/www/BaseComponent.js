@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import LandingPage from "./LandingPage";
 import Login from "./Login";
 import ChatComponent from "./App";
+import ResetPassword from "./ResetPassword"; // Import the ResetPassword component
 
 const App = () => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -30,7 +31,7 @@ const App = () => {
         setUserId("");
         localStorage.removeItem("userId");
         localStorage.removeItem("token");
-        localStorage.removeItem("userName");// Clear localStorage
+        localStorage.removeItem("userName"); // Clear localStorage
     };
 
     return (
@@ -53,11 +54,15 @@ const App = () => {
                     path="/interview/:interviewId"
                     element={
                         isLoggedIn ? (
-                            <ChatComponent setIsLoggedIn={handleLogout}/>
+                            <ChatComponent setIsLoggedIn={handleLogout} />
                         ) : (
                             <Login setIsLoggedIn={handleLogin} />
                         )
                     }
+                />
+                <Route
+                    path="/reset-password"
+                    element={<ResetPassword />} // Add the ResetPassword route
                 />
             </Routes>
         </Router>

@@ -16,6 +16,8 @@ const Login  = ({ setIsLoggedIn , setUserId}) => {
     const [password, setPassword] = useState("");
     const [repeatPassword, setRepeatPassword] = useState("");
     const [loggedIn, setLoggedIn] = useState(false);
+    const [isForgotPassword, setIsForgotPassword] = useState(false);
+    const [email, setEmail] = useState("");
 
     const  validatePassword = (password) => {
         const minLength = 8;
@@ -64,6 +66,40 @@ const Login  = ({ setIsLoggedIn , setUserId}) => {
 
         return true;
     }
+
+    const validateEmail = (email) => {
+        // Basic email regex validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        if (!email) {
+            toast.error("Email is required!", {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+            });
+            return false;
+        }
+
+        if (!emailRegex.test(email)) {
+            toast.error("Invalid email format! Please enter a valid email address.", {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+            });
+            return false;
+        }
+
+        return true;
+    };
+
 
     const logUserIn = async () => {
         if (userName.length > 7 && password.length > 0) {
@@ -141,7 +177,7 @@ const Login  = ({ setIsLoggedIn , setUserId}) => {
                     headers: {
                         "Content-Type": "application/json",
                     },
-                    body: JSON.stringify({ userName: userName, password }),
+                    body: JSON.stringify({ userName: userName, password ,email}),
                 });
 
                 if (!response.ok) {
@@ -200,11 +236,67 @@ const Login  = ({ setIsLoggedIn , setUserId}) => {
         setUserName("")
         setPassword("")
         setRepeatPassword("")
+        setEmail("")
         setIsLogin(!isLogin)
     }
+
+    const setUpForgotPassword = () => {
+        setUserName("")
+        setPassword("")
+        setRepeatPassword("")
+        setEmail("")
+        setIsForgotPassword(!isForgotPassword)
+    }
+
+    const handleForgotPassword = async () => {
+        if (!email) {
+            toast.error("Email is required.");
+            return;
+        }
+
+        try {
+            const response = await fetch(`${API_URL}/login/forgotPassword`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ email }),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                toast.error(errorData.error || "Failed to send reset link.");
+                return;
+            }
+
+            toast.success("Password reset link sent to your email.");
+            setIsForgotPassword(false);
+            setEmail("");
+        } catch (error) {
+            console.error("Error sending forgot password email:", error);
+            toast.error("Something went wrong. Please try again later.");
+        }
+    };
     return (
         <div className="login-container">
-            {isLogin ? (
+            {isForgotPassword ? (
+                <div className="initial-screen">
+                    <h1>Forgot Password</h1>
+                    <input
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="Enter your email"
+                        type="email"
+                        className="input-field"
+                    />
+                    <button onClick={handleForgotPassword} className="primary-button">
+                        Send Reset Link
+                    </button>
+                    <button onClick={setUpForgotPassword} className="secondary-button">
+                        Back to Login
+                    </button>
+                </div>
+            ) : isLogin ? (
                 <div className="initial-screen">
                     <h1>Welcome to the Data Structures and Algorithms Mock Interview Bot</h1>
                     <h1>Log in</h1>
@@ -230,6 +322,9 @@ const Login  = ({ setIsLoggedIn , setUserId}) => {
                     <button onClick={setUpSignUpForm} className="secondary-button">
                         Sign up
                     </button>
+                    <button onClick={setUpForgotPassword} className="link-button">
+                        Forgot Password?
+                    </button>
                 </div>
             ) : (
                 <div className="initial-screen">
@@ -239,6 +334,13 @@ const Login  = ({ setIsLoggedIn , setUserId}) => {
                         value={userName}
                         onChange={(e) => setUserName(e.target.value)}
                         placeholder="Username"
+                        type="text"
+                        className="input-field"
+                    />
+                    <input
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="Email"
                         type="text"
                         className="input-field"
                     />

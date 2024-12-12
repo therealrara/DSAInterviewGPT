@@ -8,6 +8,7 @@
     "@codemirror/state": "^6.4.1",
     "@codemirror/view": "^6.34.3",
     "@monaco-editor/react": "4.4.3",
+    "@sendgrid/mail": "^8.1.4",
     "@uiw/react-codemirror": "^4.23.6",
     "aws-sdk": "^2.1692.0",
     "axios": "^1.7.8",
