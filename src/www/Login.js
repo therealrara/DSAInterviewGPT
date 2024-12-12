@@ -167,7 +167,7 @@ const Login  = ({ setIsLoggedIn , setUserId}) => {
     };
 
     const signUserUp = async () => {
-        if (userName.length > 0 && password.length > 0) {
+        if (userName.length > 7) {
             if (!validatePassword(password)) {
                 return;
             }
@@ -220,7 +220,7 @@ const Login  = ({ setIsLoggedIn , setUserId}) => {
                 });
             }
         } else {
-            toast.error("Username and Password are required!", {
+            toast.error("UserName is Too short", {
                 position: "top-right",
                 autoClose: 3000,
                 hideProgressBar: false,
