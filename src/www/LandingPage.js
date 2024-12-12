@@ -67,20 +67,6 @@ const LandingPage = ({ setIsLoggedIn }) => {
                 <h1>Welcome {localStorage.getItem("userName")}</h1>
                 <h2>Your DSA Mock Interviews</h2>
             </div>
-            <div className="card-grid">
-                {interviews.map((interview) => (
-                    <div
-                        key={interview.id}
-                        className="card"
-                        onClick={() => handleCardClick(interview.interview_id, interview.in_progress)}
-                    >
-                        <h3>Interview Question: {interview.title || "No Title"}</h3>
-                        <p><strong>Score:</strong> {interview.score || "No Score Yet"}</p>
-                        <p><strong>State:</strong> {interview.in_progress ? "In Progress" : "Finished"}</p>
-                        <p><strong>Created At:</strong> {new Date(interview.created_at).toLocaleString()}</p>
-                    </div>
-                ))}
-            </div>
             <button className="start-button" onClick={handleStartInterview}>
                 Start New Interview
             </button>
