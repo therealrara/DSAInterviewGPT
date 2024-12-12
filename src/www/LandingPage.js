@@ -63,11 +63,6 @@ const LandingPage = ({ setIsLoggedIn }) => {
 
     return (
         <div className="container">
-            <header className="landing-header">
-                <button className="logout-button" onClick={() => setIsLoggedIn(false)}>
-                    Logout
-                </button>
-            </header>
             <div className="fixed-title">
                 <h1>Welcome {localStorage.getItem("userName")}</h1>
                 <h2>Your DSA Mock Interviews</h2>

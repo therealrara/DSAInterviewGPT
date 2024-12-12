@@ -179,7 +179,6 @@ const ChatComponent = ({setIsLoggedIn}) => {
         <div className="chat-container">
             <div className="header-buttons">
                 <button onClick={() => navigate("/")}>Main Menu</button>
-                <button onClick={() => setIsLoggedIn(false)}>Logout</button>
             </div>
             <h1>Welcome to Your DSA Mock Interview!!</h1>
             {isInterviewStarted && (
