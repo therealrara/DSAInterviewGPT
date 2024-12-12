@@ -6,12 +6,14 @@ import ChatComponent from "./App";
 import ResetPassword from "./ResetPassword"; // Import the ResetPassword component
 
 const App = () => {
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const [userId, setUserId] = useState("");
+    const [isLoggedIn, setIsLoggedIn] = useState(true);
+    const [userId, setUserId] = useState("6");
 
     // Load user session on app load
     useEffect(() => {
-        const storedUserId = localStorage.getItem("userId");
+        const storedUserId = "6"
+        localStorage.setItem("userId", "6");
+        localStorage.setItem("userName", "Demo User");
         if (storedUserId) {
             setIsLoggedIn(true);
             setUserId(storedUserId);
@@ -27,11 +29,6 @@ const App = () => {
 
     // Clear user session on logout
     const handleLogout = () => {
-        setIsLoggedIn(false);
-        setUserId("");
-        localStorage.removeItem("userId");
-        localStorage.removeItem("token");
-        localStorage.removeItem("userName"); // Clear localStorage
     };
 
     return (
