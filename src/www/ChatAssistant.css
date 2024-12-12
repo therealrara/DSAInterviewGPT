@@ -1,6 +1,10 @@
+body, html {
+  overflow: visible;
+}
+
 /* Common container styles */
 .chat-container {
-  padding: 20px;
+  padding-top: 85px;
   max-width: 1200px;
   margin: 0 auto;
   position: relative; /* Ensure proper stacking */
@@ -10,24 +14,17 @@
   margin: 10px 5px; /* Add spacing around buttons */
 }
 
-/* Header styles */
-.chat-header {
+.header-buttons {
+  padding-top: 85px;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: #f8f8f8;
-  padding: 10px 20px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  position: sticky; /* Stay at the top of the container */
-  top: 0;
-  z-index: 10; /* Ensure it appears above other content */
-  margin-bottom: 20px; /* Add space below the header */
+  justify-content: flex-end; /* Align buttons to the right */
+  gap: 10px; /* Add spacing between buttons */
+  margin-bottom: 20px; /* Space between buttons and the next section */
+  flex-wrap: wrap; /* Ensure buttons wrap on smaller screens */
 }
 
-/* Header buttons */
-.chat-header button {
+/* Header Buttons */
+.header-buttons button {
   padding: 10px 15px;
   font-size: 14px;
   background: #007bff;
@@ -38,7 +35,7 @@
   transition: background-color 0.3s ease;
 }
 
-.chat-header button:hover {
+.header-buttons button:hover {
   background: #0056b3;
 }
 
