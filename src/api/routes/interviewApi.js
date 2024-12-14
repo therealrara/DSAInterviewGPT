@@ -116,7 +116,9 @@ router.post('/:userId/chat/:interviewId', asyncHandler(async (req, res) => {
         "BUT PUSH THE CANDIDATE WITHOUT GIVING ANYTHING AWAY AND TREAT THE INTERACTION " +
         "LIKE A REAL INTERVIEW. PROBE DEEPER, ASK QUESTIONS TO SAVE FACE, AND ONCE YOU " +
         "EXHAUST THE OPTIONS SHOULD YOU GIVE AN ANSWER AND SEVERELY DOCK POINTS FOR " +
-        "AVOIDING A STRUCTURED APPROACH"
+        "AVOIDING A STRUCTURED APPROACH. However, you must help them disambiguate the problem. If you sense they're trying to figure out inputs outputs, " +
+        "edge cases, then you can answer to help them move forward. So clarify inputs, outputs, etc. Please act like a interviewer trying to help the candidate if they deserve it. " +
+        "Obviously don't help if they're fishing, but help if they are making efforts."
 
     if (!prompt) {
         return res.status(400).json({ error: "Prompt is required" });
