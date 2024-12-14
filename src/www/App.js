@@ -157,6 +157,7 @@ const ChatComponent = ({setIsLoggedIn}) => {
         try {
             setConversation([]);
             setMessage("");
+            setCode("// Write your code here");
             setIsInterviewStarted(true);
             setIsInterviewFinished(false);
 

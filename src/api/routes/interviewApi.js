@@ -42,6 +42,9 @@ router.get('/:userId/endInterview/:interviewId', asyncHandler(async (req, res) =
     if (!existingRecord) {
         return res.status(401).json({ error: 'Unauthorized: Invalid user or interview ID' });
     }
+    if (existingRecord.interview_feedback) {
+        return res.status(200).json({ warning: "interview not found"});
+    }
     let prompt = "Given all the info I have shared, can you please grade this DSA interview as if you were interviewing for Meta amongst a scale of strong no hire, no hire,leans in both directions,hire, strong hire? The goal here should be to assess accurate interview performance according to faang. So I would expect a thorough explanation of the code you wrote, a thorough explanation of the edge cases, a thorough explanation of the problem, and the overall fixes to the code. If there are multiple attempts at the code, definitely use the best one to evaluate the quality of the code. If no chat history, you should default to strong no hire. If there is chat history, but no problem, still no hire. Do not give generic advice. if there's not much to work with, please say so. The format should always be beginning with at all times: Score: {Rating} in bold, and then it must be the detailed feeedback. If the response always has a leading text, that is never correct. please make sure it is in form score: {Score} then detailed feedback. "
     await addObjectToArray(interviewId,{ role: "user", content: prompt , backendPrompt: true, startPrompt: false, endPrompt: true});
     if (!prompt) {
