@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import MarkdownRenderer from './MarkdownRenderer';
 import 'katex/dist/katex.min.css';
 import "./App.css";
@@ -28,6 +28,8 @@ const ChatComponent = ({setIsLoggedIn}) => {
     const [code, setCode] = useState("// Write your code here");
     const userId = localStorage.getItem("userId"); // Retrieve userId from localStorage
     const navigate = useNavigate();
+    const chatWindowRef = useRef(null);
+
 
     const handleStartInterview = async () => {
         setConversation([]);
@@ -145,6 +147,12 @@ const ChatComponent = ({setIsLoggedIn}) => {
         }
     },[isNewInterview,interviewId])
 
+    useEffect(() => {
+        if (chatWindowRef.current) {
+            chatWindowRef.current.scrollTop = chatWindowRef.current.scrollHeight;
+        }
+    }, [conversation])
+
     const handleRestartInterview = async () => {
         try {
             setConversation([]);
@@ -185,7 +193,7 @@ const ChatComponent = ({setIsLoggedIn}) => {
                 <div className="interview-session">
                     <div className="chat-section">
                         <h2>Chat</h2>
-                        <div className="chat-window">
+                        <div className="chat-window" ref={chatWindowRef}>
                             {isChatLoading && (
                                 <div className="loading-message">
                                     <Spinner /> Loading...
