@@ -97,6 +97,9 @@ router.get('/:userId/chat/:interviewId/sse', asyncHandler(async (req, res) => {
                     await req.db('interviews')
                         .where({ user_id: userId, interview_id: interviewId })
                         .update({ conversation_link: url});
+                } else {
+                    const arr = await getCurrentArray(interviewId);
+                    const url = await s3Upload(arr.filter((item) => item.backendPrompt === false),interviewId);
                 }
             } catch (error) {
                 console.error("Error writing to database:", error);
